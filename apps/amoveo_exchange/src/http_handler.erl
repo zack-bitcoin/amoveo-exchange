@@ -16,16 +16,15 @@ handle(Req, State) ->
     {ok, Req4, State}.
 
 % add buy order, add sell order.
-doit({bet, 1, ok}) -> %buy veo
+doit({bet, 1, CustomerVeoAddress, VeoAmount, BitcoinAmount, TimeLimit}) -> %buy veo
     %add it to the gen_server that waits for enough amoveo confirmations.
     %we should probably return a trade ID so the trade can be quickly looked up.
-    {ok, 0};
-doit({bet, 2, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmount}) -> %sell veo
+    {ok, [ServerBitcoinAddress, TID]};
+doit({bet, 2, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmount, TimeLimit}) -> %sell veo
     %add it to the gen_server that waits for enough amoveo confirmations.
     %we should probably return a trade ID so the trade can be quickly looked up.
-    {ok, 0};
+    {ok, [ServerVeoAddress, TID]};
 doit({exist, TID}) -> %check the status of your order
-    {ok, 0};
     {ok, <<"success 1">>};
 doit({test}) ->
     {ok, <<"success 2">>};
