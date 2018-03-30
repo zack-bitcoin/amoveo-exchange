@@ -14,7 +14,18 @@ handle(Req, State) ->
     {<<"Access-Control-Allow-Origin">>, <<"*">>}],
     {ok, Req4} = cowboy_req:reply(200, Headers, D, Req3),
     {ok, Req4, State}.
-doit([test]) ->
+
+% add buy order, add sell order.
+doit({bet, 1, ok}) -> %buy veo
+    %add it to the gen_server that waits for enough amoveo confirmations.
+    %we should probably return a trade ID so the trade can be quickly looked up.
+    {ok, 0};
+doit({bet, 2, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmount}) -> %sell veo
+    %add it to the gen_server that waits for enough amoveo confirmations.
+    %we should probably return a trade ID so the trade can be quickly looked up.
+    {ok, 0};
+doit({exist, TID}) -> %check the status of your order
+    {ok, 0};
     {ok, <<"success 1">>};
 doit({test}) ->
     {ok, <<"success 2">>};
