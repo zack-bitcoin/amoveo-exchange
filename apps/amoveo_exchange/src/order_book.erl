@@ -6,6 +6,7 @@
 -record(d, {buy_veo = [], sell_veo = [], last_match_time}).
 -record(order, {give, take, time_limit}).
 -define(File, "order_book.db").
+-define(Period, 1800).
 initial_state() ->
     #d{last_match_time = erlang:timestamp()}.
 init(ok) ->
@@ -23,7 +24,15 @@ code_change(_OldVsn, State, _Extra) -> {ok, State}.
 terminate(_, _) -> io:format("died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast(_, X) -> {noreply, X}.
+handle_call(check, _From, X) -> {reply, X, X};
 handle_call(_, _From, X) -> {reply, X, X}.
 
-
-next_batch_time() -> ok.
+check() ->
+    gen_server:call(?MODULE, check).
+next_batch_time() ->
+    D = check(),
+    Delta = timer:now_diff(erlang:timestamp(), D#d.last_match_time),
+    ?Period - (Delta / 1000000).%in seconds.
+    
+    
+    
