@@ -1,0 +1,2 @@
+-module(config).
+-compile(export_all).

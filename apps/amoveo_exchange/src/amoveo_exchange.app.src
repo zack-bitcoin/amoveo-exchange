@@ -5,7 +5,12 @@
   {mod, { amoveo_exchange_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+	ssl,
+	inets,
+	jiffy,
+	cowboy,
+	pink_hash
    ]},
   {env,[]},
   {modules, []},
