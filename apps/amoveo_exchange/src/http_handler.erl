@@ -15,7 +15,6 @@ handle(Req, State) ->
     {ok, Req4} = cowboy_req:reply(200, Headers, D, Req3),
     {ok, Req4, State}.
 
-% add buy order, add sell order.
 doit({bet, 1, CustomerVeoAddress, BitcoinRefundAddress, VeoAmount, BitcoinAmount, TimeLimit}) -> %buy veo
     %add it to the gen_server that waits for enough amoveo confirmations.
     %we should probably return a trade ID so the trade can be quickly looked up.
