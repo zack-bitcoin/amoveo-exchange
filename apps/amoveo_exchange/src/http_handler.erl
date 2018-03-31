@@ -16,10 +16,10 @@ handle(Req, State) ->
     {ok, Req4} = cowboy_req:reply(200, Headers, D, Req3),
     {ok, Req4, State}.
 
-doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmount, TimeLimit}, IP) -> %sell veo
+doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmount, TimeLimit}, IP) -> %sell or buy veo.
+    %add it to the gen_server that waits for enough confirmations.
     ok = trade_limit:doit(IP),
     TID = crypto:strong_rand_bytes(32),
-    %add it to the gen_server that waits for enough confirmations.
     ServerVeoAddress = utils:pubkey(),
     Trade = #trade{type = sell_veo, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit, time_id = TID},
     Addr = case N of
