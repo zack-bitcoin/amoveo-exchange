@@ -3,7 +3,7 @@
 -export([start_link/0]).
 -export([init/1]).
 -define(SERVER, ?MODULE).
--define(keys, [order_book]).
+-define(keys, [id_lookup, unconfirmed_veo, unconfirmed_bitcoin, order_book, history]).
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 -define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).

@@ -1,6 +1,10 @@
 -module(talker).
--export([talk_helper/3]).
+-export([talk_helper/3, talk/1]).
 
+talk(Data) ->
+    FN = config:full_node(),
+    X = talk_helper(Data, FN, 2),
+    packer:unpack(X).
 
 talk_helper2(Data, Peer) ->
     D2 = iolist_to_binary(packer:pack(Data)),

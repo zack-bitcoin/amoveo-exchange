@@ -25,11 +25,13 @@ You give the details of the trade you want to make, and we provide an address to
 Each trade has a customizable time limit. If your trade doesn't get matched or only gets partially matched by the time limit, then we refund your remaining balance.
 
 The trade's status goes through these stages:
-1) unfunded
-2) unconfirmed
-3) unmatched
-4) partially matched
-5) matched
+1, 2) unfunded
+3, 4) unconfirmed
+5) unmatched
+6) partially matched
+7) matched
+
+steps 1 and 2 are different gen servers for each currency.
 
 during steps 1 and 2 the trade is owned by the confirmations gen_server.
 

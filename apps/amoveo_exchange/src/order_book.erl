@@ -1,7 +1,7 @@
 -module(order_book).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	 next_batch_time/0
+	 next_batch_time/0, read/1
 	]).
 -record(d, {buy_veo = [], sell_veo = [], last_match_time}).
 -record(order, {give, take, time_limit}).
@@ -34,5 +34,6 @@ next_batch_time() ->
     Delta = timer:now_diff(erlang:timestamp(), D#d.last_match_time),
     ?Period - (Delta / 1000000).%in seconds.
     
-    
+read(_TID) -> 
+    0.
     
