@@ -1,6 +1,3 @@
 -module(utils).
--export([pubkey/0]).
+-export([]).
 
-pubkey() -> 
-    {ok, P} = talker:talk({pubkey}),
-    P.

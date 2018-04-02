@@ -32,7 +32,7 @@ The trade's status goes through these stages:
 5) matched
 
 
-during steps 1 and 2 the trade is owned by the confirmations gen_server.
+during steps 1 and 2 the trade is owned by the unconfirmed gen_server.
 
 during steps 3 and 4 the trade is owned by the order_book gen_server.
 

@@ -9,6 +9,12 @@ code_change(_OldVsn, State, _Extra) -> {ok, State}.
 terminate(_, _) -> io:format("died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast(_, X) -> {noreply, X}.
+handle_call({read, Many}, _From, X) -> 
+    {reply, X, X};
 handle_call(_, _From, X) -> {reply, X, X}.
 
-read(_) -> 0.
+read(Many) -> gen_server:call(?MODULE, {read, Many}).
+
+%After a payment has been used as part of a trade, we don't want to reuse that same payment for a different trade. So it needs to be removed from the history.
+delete(Height, From) ->
+    ok.

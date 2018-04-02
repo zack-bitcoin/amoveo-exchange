@@ -20,13 +20,17 @@ doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmou
     %add it to the gen_server that waits for enough confirmations.
     ok = trade_limit:doit(IP),
     TID = crypto:strong_rand_bytes(32),
-    ServerVeoAddress = utils:pubkey(),
-    Trade = #trade{type = sell_veo, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit, time_id = TID},
+    ServerVeoAddress = config:pubkey(),
+    Type = case N of
+	       1 -> sell_veo;
+	       2 -> buy_veo
+	   end,
+    Trade = #trade{type = Type, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit, time_id = TID},
     Addr = case N of
 	       1 -> unconfirmed_bitcoin:trade(Trade, TID),
 		    0;%we need to return one of the server's bitcoin addresses here.
 	       2 -> unconfirmed_veo:trade(Trade, TID),
-		    utils:pubkey()
+		    ServerVeoAddress
 	   end,
     {ok, [Addr, TID]};
 doit({exist, TID}, IP) -> %check the status of your order
