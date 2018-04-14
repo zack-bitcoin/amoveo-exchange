@@ -14,7 +14,7 @@
 unconfirmed bitcoin needs to be written. mimic unconfirmed_veo.
 
 veo_history probably shouldn't store the database as a giant list. Since this means that confirming each trade involves scanning the entire list, and making a copy in ram for unconfirmed_veo:confirm(), then that list gets scanned entirely in sum_amount.
-* if we need to store txs in a giant ordered list, then maybe we should be confirming multiple TID, so we only scan the list once for a batch.
+* maybe we should be confirming multiple TID, so we only scan the list once for a batch.
 * If we don't need to store the txs in one giant list, then we should consider doing a list of lists. each element in the top list is a list of all the txs from that block height.
 - this helps because 100 dictionary lookups in a dictionary of size 200 is considerably faster than looking at every element of a list of 60,000 elements.
 

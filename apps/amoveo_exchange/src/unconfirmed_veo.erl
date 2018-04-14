@@ -34,20 +34,18 @@ remove(TID) ->
     gen_server:cast(?MODULE, {erase, TID}).
 
 confirm(TID) ->
-    %talker:talk to find out if it is confirmed
     Trade = read(TID),
     VA = Trade#trade.veo_address,
-    B = account_history_veo:read(TID, VA),%this gen server should lazily remember how much money they have sent us, and the last height we checked how much they sent us. If the last height we checked is lower than the current height, then use history_veo to look up the recent txs, and update the amount they have sent us.
+    B = account_history_veo:read(VA),
     Fee = config:fee(veo),
+    TA = Trade#trade.veo_amount + Fee,
     if
-	(B < (Trade#trade.veo_amount + Fee)) -> ok;
+	(B < TA) -> ok;
 	true -> 
 	    id_lookup:confirm(TID),
+	    account_history_veo:remove(TA, VA),
 	    remove(TID)
     end.
-sum_amounts([]) -> 0;
-sum_amounts([{_, Tx}|T]) ->
-    config:veo_tx_amount(Tx) + sum_amounts(T).
 
 test() ->
     TID = crypto:strong_rand_bytes(32),
