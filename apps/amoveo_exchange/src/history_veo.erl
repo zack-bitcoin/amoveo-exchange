@@ -78,6 +78,7 @@ delete_internal(Height, From, [{H2, Tx}|T]) when H2 > Height ->
 delete_internal(_, _, T) -> T.
 
 test() ->
+    %use with amoveo/tests/spend.py
     CH = config:height(veo),
     H = history(0, CH),
     io:fwrite(packer:pack(H)).
