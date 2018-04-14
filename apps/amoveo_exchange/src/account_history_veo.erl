@@ -22,12 +22,11 @@ handle_call({read, TID, VA}, _From, X) ->
 		{config:height(veo) - 100, 0}
 	end,
     CH = config:height(veo),
-    Many = max(0, CurrentHeight - CH),
-    ListTxs = history_veo:history(Many, CH),%looks up the history of recent txs involving config:pubkey().
+    ListTxs = history_veo:history(CurrentHeight, CH),%looks up the history of recent txs involving config:pubkey().
     %history_veo is a gen_server, because it is saving to ram recent trade data, so we don't keep downloading it from the amoveo full node.
     B = sum_amounts(VA, ListTxs),
     Store = {CH, CurrentAmount + B},
-    X2 = dict:store(VA, Store, X)
+    X2 = dict:store(VA, Store, X),
     {reply, B, X2};
 handle_call(_, _From, X) -> {reply, X, X}.
 
@@ -35,3 +34,15 @@ remove(TID, VA) ->
     gen_server:cast(?MODULE, {remove, TID, VA}).
 read(TID, VA) ->
     gen_server:call(?MODULE, {read, TID, VA}).
+
+
+%% internal functions
+sum_amounts(_, []) -> 0;
+sum_amounts(VA, [Tx|T]) ->
+    VB = config:spend_from(veo, Tx),
+    VTA = if
+	      (VA == VB) ->
+		  config:veo_tx_amount(Tx);
+	      true -> 0
+	  end,
+    VTA + sum_amounts(VA, T).
