@@ -23,15 +23,16 @@ handle_call({read, VA}, _From, X) ->
 	case dict:find(VA, X) of
 	    {ok, Y} -> Y;
 	    error ->
-		{config:height(veo) - 100, 0}
+		{max(0, config:height(veo) - 100), 0}
 	end,
     CH = config:height(veo),
     ListTxs = history_veo:history(CurrentHeight, CH),%looks up the history of recent txs involving config:pubkey().
     %history_veo is a gen_server, because it is saving to ram recent trade data, so we don't keep downloading it from the amoveo full node.
     B = sum_amounts(VA, ListTxs),
-    Store = {CH, CurrentAmount + B},
+    NewAmount = CurrentAmount + B,
+    Store = {CH, NewAmount},
     X2 = dict:store(VA, Store, X),
-    {reply, B, X2};
+    {reply, NewAmount, X2};
 handle_call(_, _From, X) -> {reply, X, X}.
 
 remove(Amount, VA) ->
@@ -55,4 +56,9 @@ sum_amounts(VA, [STx|T]) ->
 
 test() ->
     VA = base64:decode(<<"BGRv3asifl1g/nACvsJoJiB1UiKU7Ll8O1jN/VD2l/rV95aRPrMm1cfV1917dxXVERzaaBGYtsGB5ET+4aYz7ws=">>),
-    read(VA).
+    A = read(VA),
+    A = read(VA),
+    D = 100,
+    remove(D, VA),
+    B = read(VA),
+    D = A-B.
