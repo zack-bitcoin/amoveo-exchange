@@ -3,7 +3,9 @@
 -module(unconfirmed_veo).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	 read/1, trade/2, confirm/1, test/0]).
+	 read/1, trade/2, 
+	 confirm/1, %attempts to confirm a single trade.
+	 test/0]).
 -include("records.hrl").
 init(ok) -> {ok, dict:new()}.
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
@@ -27,31 +29,36 @@ read(TID) ->
     gen_server:call(?MODULE, {read, TID}).
 trade(Trade, TID) ->%adds a new trade to the gen_server's memory.
     gen_server:cast(?MODULE, {trade, Trade, TID}).
-remove(TID) ->
-    Trade = read(TID),
-    VA = Trade#trade.veo_address,
-    accounts_history_veo:remove(TID, VA),
-    gen_server:cast(?MODULE, {erase, TID}).
-
 confirm(TID) ->
-    Trade = read(TID),
-    VA = Trade#trade.veo_address,
-    B = account_history_veo:read(VA),
     Fee = config:fee(veo),
+    {ok, Trade} = read(TID),
+    VA = Trade#trade.veo_address,
     TA = Trade#trade.veo_amount + Fee,
+    B = balance_veo:read(VA),
     if
 	(B < TA) -> ok;
 	true -> 
 	    id_lookup:confirm(TID),
-	    account_history_veo:remove(TA, VA),
-	    remove(TID)
+	    balance_veo:remove(TA, VA),
+	    io:fwrite("removing trade\n"),
+	    gen_server:cast(?MODULE, {erase, TID})
+%remove(TID)
     end.
 
 test() ->
+    VA = base64:decode(<<"BGRv3asifl1g/nACvsJoJiB1UiKU7Ll8O1jN/VD2l/rV95aRPrMm1cfV1917dxXVERzaaBGYtsGB5ET+4aYz7ws=">>),
     TID = crypto:strong_rand_bytes(32),
-    Trade = #trade{},
+    Trade = #trade{veo_address = VA, veo_amount = 500000, bitcoin_amount = 10000},
     trade(Trade, TID),
+    timer:sleep(100),
     {ok, Trade} = read(TID),
-    remove(TID),
+    io:fwrite("balance before trade confirms"),
+    io:fwrite(packer:pack(balance_veo:read(VA))),%10.000.000
+    io:fwrite("\n"),
+    confirm(TID),
+    io:fwrite("balance after trade confirms"),
+    io:fwrite(packer:pack(balance_veo:read(VA))),%2.500.000
+    io:fwrite("\n"),
+    io:fwrite(packer:pack(id_lookup:read(TID))),%unmatched
     success.
     

@@ -1,9 +1,11 @@
 %this gen server should lazily remember how much money they have sent us, and the last height we checked how much they sent us. If the last height we checked is lower than the current height, then use history_veo to look up the recent txs, and update the amount they have sent us.
 
--module(account_history_veo).
+-module(balance_veo).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	read/1, remove/2, test/0]).
+	 read/1, 
+	 remove/2,%reduces how many veo are controlled by this account.
+	 test/0]).
 init(ok) -> {ok, dict:new()}.
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.

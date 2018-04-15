@@ -21,7 +21,6 @@ handle_cast(_, X) -> {noreply, X}.
 handle_call({history, Start, CH}, _From, X) -> 
     %lazy update every time you look something up.
     H = X#db.height,
-    %Many = max(0, Start - H),
     Many = max(0, CH - H),
     TopHeight = CH,
     D = min(Many, TopHeight - H),
@@ -33,12 +32,7 @@ handle_call({history, Start, CH}, _From, X) ->
 	   end,
     Data2 = receives(Data),
     X2 = X#db{height = TopHeight, data = Data2 ++ X#db.data},
-    %D2 = max(Start, TopHeight - H),
-    D2 = Start,
-    io:fwrite("d2 "),
-    io:fwrite(integer_to_list(D2)),
-    io:fwrite("\n"),
-    HA = history_after(D2, X2#db.data),
+    HA = history_after(Start, X2#db.data),
     {reply, HA, X2};
 handle_call(_, _From, X) -> {reply, X, X}.
 

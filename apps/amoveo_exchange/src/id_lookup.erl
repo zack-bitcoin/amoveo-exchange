@@ -29,13 +29,15 @@ handle_call({read, ID}, _From, X) ->
 handle_call(_, _From, X) -> {reply, X, X}.
 
 read(ID) -> 
-    X = gen_server:call(?MODULE, {read, ID}),
-    case X of
+    case gen_server:call(?MODULE, {read, ID}) of
 	error -> empty;
-	1 -> unconfirmed_veo;
-	2 -> unconfirmed_bitcoin;
-	3 -> unmatched;
-	4 -> history
+	{ok, X} ->
+	    case X of
+		1 -> unconfirmed_veo;
+		2 -> unconfirmed_bitcoin;
+		3 -> unmatched;
+		4 -> history
+	    end
     end.
 	    
 
@@ -47,8 +49,8 @@ add_bitcoin(ID) ->
     gen_server:cast(?MODULE, {add_bitcoin, ID}).
 confirm(ID) -> 
     ok = case read(ID) of
-	     1 -> ok;
-	     2 -> ok
+	     unconfirmed_veo -> ok;
+	     unconfirmed_bitcoin -> ok
 	 end,
     gen_server:cast(?MODULE, {confirm, ID}).
 finalize(ID) -> 

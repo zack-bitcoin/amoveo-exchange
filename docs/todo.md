@@ -1,3 +1,6 @@
+we need an unconfirmed_veo_feeder to call remove/1 and confirm/1. otherwise an attacker could get them both running at once as a race condition and steal money.
+
+
 * loading veo into the order book.
 * loading bitcoin into the order book.
 * matching trades in the order book.
