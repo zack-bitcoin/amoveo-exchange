@@ -4,7 +4,8 @@
 -module(id_lookup).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	read/1, add_veo/1, add_bitcoin/1, confirm/1, finalize/1]).
+	read/1, add_veo/1, add_bitcoin/1, confirm/1, finalize/1,
+	number_to_type/1]).
 init(ok) -> {ok, dict:new()}.
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
@@ -28,16 +29,18 @@ handle_call({read, ID}, _From, X) ->
     {reply, Y, X};
 handle_call(_, _From, X) -> {reply, X, X}.
 
+number_to_type(1) -> unconfirmed_buy_veo;
+number_to_type(2) -> unconfirmed_sell_veo;
+number_to_type(3) -> unmatched_buy_veo;
+number_to_type(4) -> unmatched_sell_veo;
+number_to_type(5) -> history_buy_veo;
+number_to_type(6) -> history_sell_veo.
+
 read(ID) -> 
     case gen_server:call(?MODULE, {read, ID}) of
 	error -> empty;
 	{ok, X} ->
-	    case X of
-		1 -> unconfirmed_veo;
-		2 -> unconfirmed_bitcoin;
-		3 -> unmatched;
-		4 -> history
-	    end
+	    number_to_type(X)
     end.
 	    
 

@@ -1,7 +1,11 @@
+periodically call order_book:batch.
+
+the api needs to be written.
+
 we need an unconfirmed_veo_feeder to call remove/1 and confirm/1. otherwise an attacker could get them both running at once as a race condition and steal money.
+* We should periodically scan all the unconfirmed trades to see if any can be confirmed.
 
-
-* loading veo into the order book.
+* loading veo into order book needs to be tested.
 * loading bitcoin into the order book.
 * matching trades in the order book.
 
@@ -16,6 +20,17 @@ we need an unconfirmed_veo_feeder to call remove/1 and confirm/1. otherwise an a
 
 unconfirmed bitcoin needs to be written. mimic unconfirmed_veo.
 
+
+
+======= JS
+
+* make a trade
+
+* look up a trade's status by ID.
+
+
+====== Maybe
+
 veo_history probably shouldn't store the database as a giant list. Since this means that confirming each trade involves scanning the entire list, and making a copy in ram for unconfirmed_veo:confirm(), then that list gets scanned entirely in sum_amount.
 * maybe we should be confirming multiple TID, so we only scan the list once for a batch.
 * If we don't need to store the txs in one giant list, then we should consider doing a list of lists. each element in the top list is a list of all the txs from that block height.
@@ -24,11 +39,3 @@ veo_history probably shouldn't store the database as a giant list. Since this me
 
 * maybe we should have a way to look up a Trade ID using some other information, like the bitcoin or veo address.
 
-* a function should use unconfirmed_veo:confirm. We should periodically scan all the unconfirmed txs to see if any can be confirmed.
-
-
-JS
-
-* make a trade
-
-* look up a trade by ID.

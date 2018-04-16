@@ -3,7 +3,7 @@
 -module(unconfirmed_veo).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	 read/1, trade/2, 
+	 read/1, trade/1, 
 	 confirm/1, %attempts to confirm a single trade.
 	 test/0]).
 -include("records.hrl").
@@ -27,8 +27,12 @@ handle_call(_, _From, X) -> {reply, X, X}.
 
 read(TID) ->
     gen_server:call(?MODULE, {read, TID}).
-trade(Trade, TID) ->%adds a new trade to the gen_server's memory.
-    gen_server:cast(?MODULE, {trade, Trade, TID}).
+trade(Trade) ->%adds a new trade to the gen_server's memory.
+    T = 1,
+    unconfirmed_buy_veo = 
+	id_lookup:number_to_type(T),
+    Trade2 = Trade#trade{type = T}%convert trade to type "uncomfirmed_buy_veo
+    gen_server:cast(?MODULE, {trade, Trade2, TID}).
 confirm(TID) ->
     Fee = config:fee(veo),
     {ok, Trade} = read(TID),
@@ -40,6 +44,10 @@ confirm(TID) ->
 	true -> 
 	    id_lookup:confirm(TID),
 	    balance_veo:remove(TA, VA),
+	    T = 3,
+	    unmatched_buy_veo = id_lookup:number_to_type(T),
+	    Trade2 = Trade#trade{type = T},%change to type unmatched_buy_veo
+	    order_book:trade(Trade2),
 	    io:fwrite("removing trade\n"),
 	    gen_server:cast(?MODULE, {erase, TID})
 %remove(TID)
@@ -48,8 +56,8 @@ confirm(TID) ->
 test() ->
     VA = base64:decode(<<"BGRv3asifl1g/nACvsJoJiB1UiKU7Ll8O1jN/VD2l/rV95aRPrMm1cfV1917dxXVERzaaBGYtsGB5ET+4aYz7ws=">>),
     TID = crypto:strong_rand_bytes(32),
-    Trade = #trade{veo_address = VA, veo_amount = 500000, bitcoin_amount = 10000},
-    trade(Trade, TID),
+    Trade = #trade{veo_address = VA, veo_amount = 500000, bitcoin_amount = 10000, id = TID},
+    trade(Trade),
     timer:sleep(100),
     {ok, Trade} = read(TID),
     io:fwrite("balance before trade confirms"),

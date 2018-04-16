@@ -16,8 +16,11 @@ handle(Req, State) ->
     {ok, Req4} = cowboy_req:reply(200, Headers, D, Req3),
     {ok, Req4, State}.
 
+doit({trade, veo}) ->
+    0;
 doit(X) ->
     io:fwrite("cannot handle this "),
     io:fwrite(packer:pack(X)),
-    io:fwrite("\n").
+    io:fwrite("\n"),
+    0.
     
