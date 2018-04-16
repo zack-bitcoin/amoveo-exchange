@@ -10,6 +10,9 @@ full_node() ->
     end.
 message_frequency() -> 1.
 trade_frequency() -> 0.2.
+block_txs(N) ->
+    {ok, B} = talker:talk({block, 1, N}),
+    B.
 pubkey() -> 
     {ok, P} = talker:talk({pubkey}),
     base64:decode(P).

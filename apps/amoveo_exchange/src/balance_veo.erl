@@ -3,62 +3,92 @@
 -module(balance_veo).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	 read/1, 
+	 read/1, sync/0,
 	 remove/2,%reduces how many veo are controlled by this account.
 	 test/0]).
-init(ok) -> {ok, dict:new()}.
+-record(d, {height, dict}).
+init(ok) -> 
+    D = #d{height = config:height(veo) - 100, 
+	   dict = dict:new()},
+    {ok, D}.
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 terminate(_, _) -> io:format("died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast({remove, Amount, VA}, X) -> 
-    X2 = case dict:find(VA, X) of
+    Dict = X#d.dict,
+    X2 = case dict:find(VA, Dict) of
 	     error -> X;
-	     {ok, {CH, A}} ->
-		 A2 = A - Amount,
-		 dict:store(VA, {CH, A2}, X)
+	     {ok, D} ->
+		 Dict2 = dict:store(VA, D - Amount, Dict),
+		 X#d{dict = Dict2}
 	 end,
     {noreply, X2};
+handle_cast(sync, X) ->
+    X2 = sync_internal(X),
+    {noreply, X2};
 handle_cast(_, X) -> {noreply, X}.
+    
 handle_call({read, VA}, _From, X) -> 
-    {CurrentHeight, CurrentAmount} = 
-	case dict:find(VA, X) of
+    Dict = X#d.dict,
+    Amount = 
+	case dict:find(VA, Dict) of
 	    {ok, Y} -> Y;
-	    error ->
-		{max(0, config:height(veo) - 100), 0}
+	    error -> 0
 	end,
-    CH = config:height(veo),
-    ListTxs = history_veo:history(CurrentHeight, CH),%looks up the history of recent txs involving config:pubkey().
-    %history_veo is a gen_server, because it is saving to ram recent trade data, so we don't keep downloading it from the amoveo full node.
-    B = sum_amounts(VA, ListTxs),
-    NewAmount = CurrentAmount + B,
-    Store = {CH, NewAmount},
-    X2 = dict:store(VA, Store, X),
-    {reply, NewAmount, X2};
+    {reply, Amount, X};
 handle_call(_, _From, X) -> {reply, X, X}.
 
-remove(Amount, VA) ->
-    gen_server:cast(?MODULE, {remove, Amount, VA}).
-read(VA) ->
-    gen_server:call(?MODULE, {read, VA}).
+remove(Amount, VA) -> gen_server:cast(?MODULE, {remove, Amount, VA}).
+read(VA) -> gen_server:call(?MODULE, {read, VA}).
+sync() -> gen_server:cast(?MODULE, sync).
 
 
 %% internal functions
-sum_amounts(_, []) -> 0;
-sum_amounts(VA, [STx|T]) ->
-    Tx = element(2, STx),
-    VB = config:spend_from(veo, Tx),
-    %VB is a spend tx. this is wrong.
-    VTA = if
-	      (VA == VB) ->
-		  config:spend_amount(veo, Tx);
-	      true -> 0
-	  end,
-    VTA + sum_amounts(VA, T).
+sync_internal(X) ->
+    MyHeight = X#d.height,
+    NodeHeight = config:height(veo),
+    if
+	MyHeight >= NodeHeight -> X;
+	true ->
+	    %lookup block MyHeight + 1
+	    %for each tx VA = veo address that sent us money.
+	    %do
+	    Txs = tl(config:block_txs(MyHeight + 1)),%ignore coinbase tx.
+	    VMe = config:pubkey(),
+	    Dict2 = sync_block(X#d.dict, VMe, Txs),
+	    X2 = X#d{dict = Dict2},
+	    sync_internal(X2)
+    end.
+sync_block(Dict, _, []) -> Dict;
+sync_block(Dict, VMe, [H|T]) ->
+    Tx = element(2, H),%remove signature.
+    Dict2 = case element(1, Tx) of
+	     spend ->
+		 VT = config:spend_to(Tx),
+		 if
+		     VT == VMe -> %spends to the server.
+			 VA = config:spend_from(Tx),
+			 D = 
+			     case dict:find(VA, Dict) of
+				 {ok, Y} -> Y;
+				 error -> 0
+			     end,
+			 B = config:spend_amount(veo, Tx),
+			 NewAmount = D + B,
+			 dict:store(VA, NewAmount, Dict);
+		     true -> Dict
+		 end;
+	     _ -> Dict
+	 end,
+    sync_block(Dict2, VMe, T).
+    
+
 
 test() ->
+    sync(),
+    timer:sleep(300),
     VA = base64:decode(<<"BGRv3asifl1g/nACvsJoJiB1UiKU7Ll8O1jN/VD2l/rV95aRPrMm1cfV1917dxXVERzaaBGYtsGB5ET+4aYz7ws=">>),
-    A = read(VA),
     A = read(VA),
     D = 100,
     remove(D, VA),

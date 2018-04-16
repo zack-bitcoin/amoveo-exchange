@@ -45,3 +45,10 @@ during steps 3 and 4 the trade is owned by the order_book gen_server.
 During step 5 the trade is owned by the trade history gen_server.
 
 Additionally, we have a gen_server for knowing which stage the trade is in so we know where to look it up.
+
+
+
+
+====== Warnings
+
+* If you ever deleted the database for any reason, it is important to change your public key in the full node. Otherwise you could accept payments from your history that are no longer valid. Allowing people to trade in your market without paying you.

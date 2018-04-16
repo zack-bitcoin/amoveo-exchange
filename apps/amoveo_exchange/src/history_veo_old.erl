@@ -1,7 +1,7 @@
 %This is a record of all the payments that the server has received which have not yet received their bitcoin.
 %It is storing spend transactions from the blockchain, not trades.
 
--module(history_veo).
+-module(history_veo_old).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 	test/0, history/2]).
