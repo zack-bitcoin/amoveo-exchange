@@ -12,11 +12,15 @@ start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 terminate(_, _) -> io:format("died!"), ok.
 handle_info(_, X) -> {noreply, X}.
-handle_cast({trade, Trade, TID}, X) -> 
+handle_cast({trade, Trade}, X) -> 
+    TID = Trade#trade.id,
     X2 = dict:store(TID, Trade, X),
     id_lookup:add_veo(TID),
     {noreply, X2};
 handle_cast(_, X) -> {noreply, X}.
+handle_call(keys, _From, X) -> 
+    K = dict:fetch_keys(X),
+    {reply, K, X};
 handle_call({erase, TID}, _From, X) -> 
     Y = dict:erase(TID, X),
     {reply, Y, X};
@@ -27,12 +31,14 @@ handle_call(_, _From, X) -> {reply, X, X}.
 
 read(TID) ->
     gen_server:call(?MODULE, {read, TID}).
+keys() ->
+    gen_server:call(?MODULE, keys).
 trade(Trade) ->%adds a new trade to the gen_server's memory.
     T = 1,
     unconfirmed_buy_veo = 
 	id_lookup:number_to_type(T),
-    Trade2 = Trade#trade{type = T}%convert trade to type "uncomfirmed_buy_veo
-    gen_server:cast(?MODULE, {trade, Trade2, TID}).
+    Trade2 = Trade#trade{type = T},%convert trade to type "uncomfirmed_buy_veo
+    gen_server:cast(?MODULE, {trade, Trade2}).
 confirm(TID) ->
     Fee = config:fee(veo),
     {ok, Trade} = read(TID),

@@ -1,13 +1,12 @@
-periodically call order_book:batch.
 
 the api needs to be written.
 
-we need an unconfirmed_veo_feeder to call remove/1 and confirm/1. otherwise an attacker could get them both running at once as a race condition and steal money.
-* We should periodically scan all the unconfirmed trades to see if any can be confirmed.
+* We should periodically scan all the unconfirmed trades to see if any can be confirmed. use unconfirmed_veo_feeder:confirm_all().
 
 * loading veo into order book needs to be tested.
 * loading bitcoin into the order book.
 * matching trades in the order book.
+periodically call order_book:batch.
 
 
 * keep a record of these things on the hard drive:

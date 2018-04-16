@@ -31,3 +31,4 @@ spend_amount(veo, Tx) -> element(6, Tx).
    
 fee(veo) -> 7000000;
 fee(bitcoin) -> 70000.
+make_id() -> crypto:strong_rand_bytes(32).

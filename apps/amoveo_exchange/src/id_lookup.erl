@@ -6,6 +6,7 @@
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 	read/1, add_veo/1, add_bitcoin/1, confirm/1, finalize/1,
 	number_to_type/1]).
+-include("records.hrl").
 init(ok) -> {ok, dict:new()}.
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
@@ -33,14 +34,31 @@ number_to_type(1) -> unconfirmed_buy_veo;
 number_to_type(2) -> unconfirmed_sell_veo;
 number_to_type(3) -> unmatched_buy_veo;
 number_to_type(4) -> unmatched_sell_veo;
-number_to_type(5) -> history_buy_veo;
-number_to_type(6) -> history_sell_veo.
+number_to_type(5) -> history.
 
 read(ID) -> 
     case gen_server:call(?MODULE, {read, ID}) of
-	error -> empty;
+	error -> [<<"trade does not exist">>];
 	{ok, X} ->
-	    number_to_type(X)
+	    case number_to_type(X) of
+		unconfirmed_buy_veo -> 
+		    Fee = config:fee(veo),
+		    Trade = unconfirmed_veo:read(ID),
+		    VA = Trade#trade.veo_address,
+		    TA = Trade#trade.veo_amount + Fee,
+		    B = balance_veo:read(VA),
+		    [<<"waiting for confirmations">>, B, TA, Trade];
+		unconfirmed_sell_veo -> [<<"waiting for confirmations to sell veo">>, 0];
+		unmatched_buy_veo -> 
+		    Trade = order_book:read(buy_veo, ID),
+		    [<<"trade in order book">>, Trade];
+		unmatched_sell_veo -> 
+		    Trade = order_book:read(sell_veo, ID),
+		    [<<"trade in order book">>, Trade];
+		history -> 
+		    Trade = trade_history:read(ID),
+		    [<<"trade completed">>, Trade]
+	    end
     end.
 	    
 

@@ -19,32 +19,23 @@ handle(Req, State) ->
 doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmount, TimeLimit}, IP) -> %sell or buy veo.
     %add it to the gen_server that waits for enough confirmations.
     ok = trade_limit:doit(IP),
-    TID = crypto:strong_rand_bytes(32),
-    ServerVeoAddress = config:pubkey(),
+    TID = config:make_id(),
     Type = case N of
-	       1 -> sell_veo;
-	       2 -> buy_veo
+	       1 -> unconfirmed_buy_veo;
+	       2 -> unconfirmed_sell_veo
 	   end,
-    Trade = #trade{type = Type, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit, time_id = TID},
+    Trade = #trade{type = Type, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit, id = TID},
     Addr = case N of
-	       1 -> unconfirmed_bitcoin:trade(Trade, TID),
-		    0;%we need to return one of the server's bitcoin addresses here.
-	       2 -> unconfirmed_veo:trade(Trade, TID),
-		    ServerVeoAddress
+	       1 -> unconfirmed_veo_feeder:trade(Trade),
+		    ServerVeoAddress = config:pubkey(),
+		    ServerVeoAddress;
+	       2 -> unconfirmed_bitcoin:trade(Trade),
+		    0%we need to return one of the server's bitcoin addresses here.
 	   end,
     {ok, [Addr, TID]};
 doit({exist, TID}, IP) -> %check the status of your order
     ok = message_limit:doit(IP),
-    Location = id_lookup:read(TID),
-    Trade = 
-	case Location of
-	    empty -> <<"Trade ID does not exist">>;
-	    unconfirmed_veo -> unconfirmed_veo:read(TID);
-	    unconfirmed_bitcoin -> unconfirmed_bitcoin:read(TID);
-	    unmatched -> order_book:read(TID);
-	    history -> history:read(TID)
-	end,
-    {ok, Trade};
+    {ok, id_lookup:read(TID)};
 doit({test}, _) ->
     {ok, <<"success 2">>};
 doit(X, _) ->
