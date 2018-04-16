@@ -1,7 +1,9 @@
 ======= Erlang
 
-in veo_history:
-* we should delete the information as soon as we learned about it and stored it in account_history_veo, or learned that it was invalid.
+history_veo and balance_veo need to be redesigned.
+right now balance veo looks up one account at a time, and reads a lot of history.
+Instead we should look up one block at a time, and read a lot of accounts.
+This way we don't have to store spend transactions in ram.
 O(number of transactions) is much better than O((number of transactions) * (number of traders))
 
 * We should periodically scan all the unconfirmed trades to see if any can be confirmed. use unconfirmed_veo_feeder:confirm_all().
