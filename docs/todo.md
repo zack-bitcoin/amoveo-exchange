@@ -4,10 +4,10 @@
 * loading veo into order book needs to be tested.
 
 Write bitcoin stuff to mimic veo stuff:
+* write history_bitcoin
 * write balance_bitcoin
 * write unconfirmed_bitcoin
 * write unconfirmed_bitcoin_feeder
-* write hitory_bitcoin
 * loading bitcoin into the order book.
 
 
@@ -15,7 +15,6 @@ Write bitcoin stuff to mimic veo stuff:
 - cron job to periodically match trades in the order book.
 
 * keep a backup of all gen_server data to the hard drive
-
 
 
 ======= JS
