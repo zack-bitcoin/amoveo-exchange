@@ -1,1 +1,1 @@
--record(trade, {type, veo_address, bitcoin_address, veo_amount, bitcoin_amount, time_limit, time, id}).
+-record(trade, {type, veo_address, bitcoin_address, veo_amount, bitcoin_amount, time_limit = 0, time = 0, id = 0}).

@@ -3,7 +3,7 @@
 -module(unconfirmed_veo).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	 read/1, trade/1, 
+	 read/1, trade/1, keys/0,
 	 confirm/1, %attempts to confirm a single trade.
 	 test/0]).
 -include("records.hrl").
@@ -34,10 +34,10 @@ read(TID) ->
 keys() ->
     gen_server:call(?MODULE, keys).
 trade(Trade) ->%adds a new trade to the gen_server's memory.
-    T = 1,
-    unconfirmed_buy_veo = 
+    T = 2,
+    unconfirmed_sell_veo = 
 	id_lookup:number_to_type(T),
-    Trade2 = Trade#trade{type = T},%convert trade to type "uncomfirmed_buy_veo
+    Trade2 = Trade#trade{type = T},%convert trade to type "uncomfirmed_sell_veo
     gen_server:cast(?MODULE, {trade, Trade2}).
 confirm(TID) ->
     Fee = config:fee(veo),
@@ -60,19 +60,18 @@ confirm(TID) ->
     end.
 
 test() ->
+    balance_veo:sync(),
+    timer:sleep(300),
+    unconfirmed_veo_feeder:confirm_all(),
+    timer:sleep(300),
     VA = base64:decode(<<"BGRv3asifl1g/nACvsJoJiB1UiKU7Ll8O1jN/VD2l/rV95aRPrMm1cfV1917dxXVERzaaBGYtsGB5ET+4aYz7ws=">>),
     TID = crypto:strong_rand_bytes(32),
-    Trade = #trade{veo_address = VA, veo_amount = 500000, bitcoin_amount = 10000, id = TID},
+    Trade = #trade{type = 2, veo_address = VA, bitcoin_address = <<>>, veo_amount = 500000, bitcoin_amount = 10000, time_limit = 1000, id = TID},
     trade(Trade),
-    timer:sleep(100),
+    timer:sleep(300),
     {ok, Trade} = read(TID),
-    io:fwrite("balance before trade confirms"),
-    io:fwrite(packer:pack(balance_veo:read(VA))),%10.000.000
-    io:fwrite("\n"),
+    10000000 = balance_veo:read(VA),
     confirm(TID),
-    io:fwrite("balance after trade confirms"),
-    io:fwrite(packer:pack(balance_veo:read(VA))),%2.500.000
-    io:fwrite("\n"),
-    io:fwrite(packer:pack(id_lookup:read(TID))),%unmatched
+    2500000 = balance_veo:read(VA),
     success.
     

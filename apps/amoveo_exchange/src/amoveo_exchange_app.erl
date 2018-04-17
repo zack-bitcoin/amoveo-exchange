@@ -4,7 +4,7 @@
 start(_StartType, _StartArgs) ->
     inets:start(),
     start_http(),
-    start_balance_veo_sync(),
+    veo_sync(),
     confirm_veo_cron(),
     spawn(fun() ->
                   timer:sleep(1000),
@@ -33,14 +33,12 @@ cvc() ->
     spawn(fun() -> unconfirmed_veo_feeder:confirm_all() end),
     cvc().
 		  
-    
-		  
-start_balance_veo_sync() ->
-    spawn(fun() -> sbvs() end).
-sbvs() ->
+veo_sync() ->
+    spawn(fun() -> veo_sync2() end).
+veo_sync2() ->
     timer:sleep(config:sync_block_period(veo)),
     spawn(fun() -> balance_veo:sync() end),
-    sbvs().
+    veo_sync2().
 		  
 		  
 		  
