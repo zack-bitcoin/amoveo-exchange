@@ -2,8 +2,6 @@
 
 balance_veo sync should be automatically called to sync transactions from recent blocks.
 
-new balance_veo needs passing tests.
-
 * We should periodically scan all the unconfirmed trades to see if any can be confirmed. use unconfirmed_veo_feeder:confirm_all().
 * loading veo into order book needs to be tested.
 

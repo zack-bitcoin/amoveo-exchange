@@ -8,7 +8,7 @@
 	 test/0]).
 -record(d, {height, dict}).
 init(ok) -> 
-    D = #d{height = config:height(veo) - 100, 
+    D = #d{height = max(0, config:height(veo) - 100), 
 	   dict = dict:new()},
     {ok, D}.
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
@@ -57,7 +57,7 @@ sync_internal(X) ->
 	    Txs = tl(config:block_txs(MyHeight + 1)),%ignore coinbase tx.
 	    VMe = config:pubkey(),
 	    Dict2 = sync_block(X#d.dict, VMe, Txs),
-	    X2 = X#d{dict = Dict2},
+	    X2 = X#d{dict = Dict2, height = MyHeight + 1},
 	    sync_internal(X2)
     end.
 sync_block(Dict, _, []) -> Dict;
@@ -65,10 +65,10 @@ sync_block(Dict, VMe, [H|T]) ->
     Tx = element(2, H),%remove signature.
     Dict2 = case element(1, Tx) of
 	     spend ->
-		 VT = config:spend_to(Tx),
+		 VT = config:spend_to(veo, Tx),
 		 if
 		     VT == VMe -> %spends to the server.
-			 VA = config:spend_from(Tx),
+			 VA = config:spend_from(veo, Tx),
 			 D = 
 			     case dict:find(VA, Dict) of
 				 {ok, Y} -> Y;
@@ -93,4 +93,6 @@ test() ->
     D = 100,
     remove(D, VA),
     B = read(VA),
-    D = A-B.
+    D = A-B,
+    10000000 = A,
+    success.
