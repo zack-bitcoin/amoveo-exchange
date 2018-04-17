@@ -4,6 +4,8 @@
 start(_StartType, _StartArgs) ->
     inets:start(),
     start_http(),
+    start_balance_veo_sync(),
+    confirm_veo_cron(),
     spawn(fun() ->
                   timer:sleep(1000),
                   %batches:start_cron(),
@@ -24,3 +26,21 @@ start_http() ->
                 [{ip, {0, 0, 0, 0}}, {port, Port}],
                 [{env, [{dispatch, Dispatch}]}]),
     ok.
+confirm_veo_cron() ->
+    spawn(fun() -> cvc() end).
+cvc() ->
+    timer:sleep(config:confirm_tx_period(veo)),
+    spawn(fun() -> unconfirmed_veo_feeder:confirm_all() end),
+    cvc().
+		  
+    
+		  
+start_balance_veo_sync() ->
+    spawn(fun() -> sbvs() end).
+sbvs() ->
+    timer:sleep(config:sync_block_period(veo)),
+    spawn(fun() -> balance_veo:sync() end),
+    sbvs().
+		  
+		  
+		  

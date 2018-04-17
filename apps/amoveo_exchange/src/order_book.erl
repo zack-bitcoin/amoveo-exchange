@@ -1,7 +1,8 @@
 -module(order_book).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	 trade/1, time_since_last_batch/0, read/2
+	 trade/1, time_since_last_batch/0, read/2,
+	 check/0
 	]).
 -record(d, {buy_veo = [], sell_veo = [], last_match_time}).
 -record(order, {trade, price}).

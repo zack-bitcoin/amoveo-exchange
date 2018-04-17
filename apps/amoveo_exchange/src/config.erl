@@ -35,3 +35,7 @@ spend_amount(veo, Tx) -> element(6, Tx).
 fee(veo) -> 7000000;
 fee(bitcoin) -> 70000.
 make_id() -> crypto:strong_rand_bytes(32).
+
+sync_block_period(veo) -> 40000.%in miliseconds.
+confirm_tx_period(veo) -> 40000.%in miliseconds.
+    
