@@ -1,7 +1,5 @@
 ======= Erlang
 
-* loading veo into order book needs to be tested.
-
 Write bitcoin stuff to mimic veo stuff:
 * write balance_bitcoin
 * write unconfirmed_bitcoin
@@ -20,3 +18,8 @@ use the 2 api commands:
 * make a trade
 * look up a trade's status by ID.
 
+use the open orders api to draw graphs.
+
+====== API
+
+* look up open orders in the order book.
