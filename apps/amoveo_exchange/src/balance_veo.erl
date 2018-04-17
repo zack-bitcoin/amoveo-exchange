@@ -4,7 +4,7 @@
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 	 read/1, sync/0,
-	 remove/2,%reduces how many veo are controlled by this account.
+	 reduce/2,%reduces how many veo are controlled by this account.
 	 test/0]).
 -record(d, {height, dict}).
 init(ok) -> 
@@ -15,7 +15,7 @@ start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 terminate(_, _) -> io:format("died!"), ok.
 handle_info(_, X) -> {noreply, X}.
-handle_cast({remove, Amount, VA}, X) -> 
+handle_cast({reduce, Amount, VA}, X) -> 
     Dict = X#d.dict,
     X2 = case dict:find(VA, Dict) of
 	     error -> X;
@@ -39,7 +39,7 @@ handle_call({read, VA}, _From, X) ->
     {reply, Amount, X};
 handle_call(_, _From, X) -> {reply, X, X}.
 
-remove(Amount, VA) -> gen_server:cast(?MODULE, {remove, Amount, VA}).
+reduce(Amount, VA) -> gen_server:cast(?MODULE, {reduce, Amount, VA}).
 read(VA) -> gen_server:call(?MODULE, {read, VA}).
 sync() -> gen_server:cast(?MODULE, sync).
 
@@ -91,7 +91,7 @@ test() ->
     VA = base64:decode(<<"BGRv3asifl1g/nACvsJoJiB1UiKU7Ll8O1jN/VD2l/rV95aRPrMm1cfV1917dxXVERzaaBGYtsGB5ET+4aYz7ws=">>),
     A = read(VA),
     D = 100,
-    remove(D, VA),
+    reduce(D, VA),
     B = read(VA),
     D = A-B,
     10000000 = A,

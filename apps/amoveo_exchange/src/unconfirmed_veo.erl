@@ -49,7 +49,7 @@ confirm(TID) ->
 	(B < TA) -> ok;
 	true -> 
 	    id_lookup:confirm(TID),
-	    balance_veo:remove(TA, VA),
+	    balance_veo:reduce(TA, VA),
 	    T = 3,
 	    unmatched_buy_veo = id_lookup:number_to_type(T),
 	    Trade2 = Trade#trade{type = T},%change to type unmatched_buy_veo

@@ -18,8 +18,6 @@ Write bitcoin stuff to mimic veo stuff:
 
 * keep a backup of all gen_server data to the hard drive
 
-balance_veo:remove should be called "reduce".
-
 ======= JS
 
 use the 2 api commands:
