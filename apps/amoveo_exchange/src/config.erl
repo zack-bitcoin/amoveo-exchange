@@ -13,6 +13,7 @@ trade_frequency() -> 0.2.
 block_txs(N) ->
     {ok, B} = talker:talk({block, 1, N}),
     B.
+scan_history() -> 100.%when turning on the node with empty databases, how far back in the past do you include transactions from?
 pubkey() -> 
     {ok, P} = talker:talk({pubkey}),
     base64:decode(P).
@@ -22,11 +23,11 @@ confirmations() ->
 	test -> 2;
 	_ -> 30
     end.
+height(bitcoin) -> 0.
+
 height(veo) -> 
     {ok, X} = talker:talk({height, 1}),
     max(0, X - confirmations()).
-
-%stuff_signed(veo, Tx) -> element(2, Tx).
 
 spend_from(veo, Tx) -> element(2, Tx).
 spend_to(veo, Tx) -> element(5, Tx).

@@ -1,7 +1,18 @@
 ======= Erlang
 
+* config:height(bitcoin). needs to be implemented
+
+* run a bitcoin full node
+* in bitcoin.conf set prune=550.
+ - this way we only keep track of the recent 550mb of blocks.
+* in bitcoin.conf set txindex=1
+ - this way we can look up any tx.
+ - costs about 11 gb
+
 Write bitcoin stuff to mimic veo stuff:
 * write balance_bitcoin
+-sync_internal/1
+-test/0
 * write unconfirmed_bitcoin
 * write unconfirmed_bitcoin_feeder
 * loading bitcoin into the order book.

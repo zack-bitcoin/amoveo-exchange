@@ -1,4 +1,4 @@
-%this gen server should lazily remember how much money they have sent us, and the last height we checked how much they sent us. If the last height we checked is lower than the current height, then use history_veo to look up the recent txs, and update the amount they have sent us.
+%this gen server should lazily remember how much money they have sent us, and the last height we checked how much they sent us.
 
 -module(balance_veo).
 -behaviour(gen_server).
@@ -8,7 +8,7 @@
 	 test/0]).
 -record(d, {height, dict}).
 init(ok) -> 
-    D = #d{height = max(0, config:height(veo) - 100), 
+    D = #d{height = max(0, config:height(veo) - config:scan_history()), 
 	   dict = dict:new()},
     {ok, D}.
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
@@ -28,7 +28,6 @@ handle_cast(sync, X) ->
     X2 = sync_internal(X),
     {noreply, X2};
 handle_cast(_, X) -> {noreply, X}.
-    
 handle_call({read, VA}, _From, X) -> 
     Dict = X#d.dict,
     Amount = 
@@ -51,9 +50,6 @@ sync_internal(X) ->
     if
 	MyHeight >= NodeHeight -> X;
 	true ->
-	    %lookup block MyHeight + 1
-	    %for each tx VA = veo address that sent us money.
-	    %do
 	    Txs = tl(config:block_txs(MyHeight + 1)),%ignore coinbase tx.
 	    VMe = config:pubkey(),
 	    Dict2 = sync_block(X#d.dict, VMe, Txs),
