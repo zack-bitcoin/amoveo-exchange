@@ -10,32 +10,6 @@ full_node() ->
 	test -> "http://localhost:3011/";
 	_ -> "http://localhost:8081/"
     end.
-bitcoin_json(Command) ->
-    bitcoin_json(Command, []).
-bitcoin_json(Command, Params) when 
-  (is_list(Params) and is_binary(Command)) ->
-    {[{<<"jsonrpc">>,<<"1.0">>},
-      {<<"id">>,<<"amoveo_exchange">>},
-      {<<"method">>,Command},
-      {<<"params">>,Params}]}.
-
-bitcoin_old(Command, Params) ->
-    J = bitcoin_json(Command, Params),
-    S = binary_to_list(jiffy:encode(J)),
-    C = "curl --user user --data-binary '" ++ S ++ "' -H 'content-type: text/plain;' http://127.0.0.1:8332/ > temp",
-    io:fwrite("shell command: "),
-    io:fwrite(C),
-    io:fwrite("\n"),
-    file:write_file("temp.sh", C),
-    os:cmd("sh temp.sh"),
-    timer:sleep(200),
-    {ok, F} = file:read_file("temp"),
-    io:fwrite("binary json is "),
-    io:fwrite(F),
-    io:fwrite("\n"),
-    %F2 = jiffy:decode(F),
-    %F2.
-    F.
 bitcoin(Command) ->
     C = "bitcoin-cli " ++ Command ++ " > temp",
     os:cmd(C),
@@ -47,7 +21,7 @@ bitcoin(Command) ->
     F.
 new_address(bitcoin) ->
     X = bitcoin("getnewaddress"),
-    X.
+    lists:reverse(tl(lists:reverse(binary_to_list(X)))).
 
 message_frequency() -> 1.
 trade_frequency() -> 0.2.
@@ -57,7 +31,10 @@ block_txs(N) ->
 block_txs(bitcoin, N) ->
 % lookup txs from one block by height = getblock(getblockhash(height))
     F = bitcoin("getblockhash " ++ integer_to_list(N)),
-    F.
+% <<"000000000000000004ec466ce4732fe6f1ed1cddc2ed4b328fff5224276e3f6f\n">>]
+    Y = lists:reverse(tl(lists:reverse(binary_to_list(F)))),
+    G = bitcoin("getblock "++Y),
+    G.
     
 scan_history() -> 100.%when turning on the node with empty databases, how far back in the past do you include transactions from?
 pubkey() -> 
@@ -72,7 +49,9 @@ confirmations() ->
 
 height(bitcoin) -> 
     X = bitcoin("getblockcount"),
-    X;
+   %<<"519291\n">>
+    Y = lists:reverse(tl(lists:reverse(binary_to_list(X)))),
+    list_to_integer(Y);
 height(veo) -> 
     {ok, X} = talker:talk({height, 1}),
     max(0, X - confirmations()).
@@ -90,6 +69,10 @@ confirm_tx_period(veo) -> 40000.%in miliseconds.
     
 
 bitcoin_test() ->
+%[<<"519291\n">>,
+%<<"3NenWVjVX15nyR6yuBPy7ExeFUgHGshjss\n">>,
+% <<"000000000000000004ec466ce4732fe6f1ed1cddc2ed4b328fff5224276e3f6f\n">>]
+
     [height(bitcoin),
      new_address(bitcoin),
      block_txs(bitcoin, 400000)].
