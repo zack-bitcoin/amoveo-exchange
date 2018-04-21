@@ -28,7 +28,7 @@ bitcoin(Command, Params) ->
     F2.
 new_address(bitcoin) ->
     X = bitcoin(<<"getnewaddress">>, []),
-    io:fwrite(X).
+    X.
 
 message_frequency() -> 1.
 trade_frequency() -> 0.2.
@@ -53,8 +53,7 @@ confirmations() ->
 
 height(bitcoin) -> 
     X = bitcoin(<<"getblockcount">>, []),
-    io:fwrite(X),
-    1=2;
+    X.
 height(veo) -> 
     {ok, X} = talker:talk({height, 1}),
     max(0, X - confirmations()).
