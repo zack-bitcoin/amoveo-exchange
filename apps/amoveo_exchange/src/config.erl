@@ -70,7 +70,7 @@ confirm_tx_period(veo) -> 40000.%in miliseconds.
 
 bitcoin_test() ->
 %[519291,"3JJCopJuEhAJreS4HDdxS2F2ZgZnubNfGh",<<>>]
-
-    [height(bitcoin),
+    H = height(bitcoin),
+    [H,
      new_address(bitcoin),
-     block_txs(bitcoin, 400000)].
+     block_txs(bitcoin, H-50)].
