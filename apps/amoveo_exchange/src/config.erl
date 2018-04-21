@@ -26,6 +26,9 @@ bitcoin(Command, Params) ->
     os:cmd(C),
     timer:sleep(200),
     {ok, F} = file:read_file("temp"),
+    io:fwrite("binary json is "),
+    io:fwrite(F),
+    io:fwrite("\n"),
     F2 = jiffy:decode(F),
     F2.
 new_address(bitcoin) ->
