@@ -43,6 +43,8 @@ block_txs(bitcoin, N) ->
     Txs = element(2, lists:nth(10, element(1, jiffy:decode(G)))),
     io:fwrite("block_txs 4\n"),
     Tx = hd(Txs),
+    io:fwrite(Tx),
+    io:fwrite("\n"),
     bitcoin("gettransaction " ++ Tx).
 %Txs.
 scan_history() -> 100.%when turning on the node with empty databases, how far back in the past do you include transactions from?
