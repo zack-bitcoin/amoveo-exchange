@@ -32,8 +32,9 @@ bitcoin(Command, Params) ->
     io:fwrite("binary json is "),
     io:fwrite(F),
     io:fwrite("\n"),
-    F2 = jiffy:decode(F),
-    F2.
+    %F2 = jiffy:decode(F),
+    %F2.
+    F.
 new_address(bitcoin) ->
     X = bitcoin(<<"getnewaddress">>, []),
     X.
