@@ -26,10 +26,17 @@ new_address(bitcoin) ->
 
 message_frequency() -> 1.
 trade_frequency() -> 0.2.
+%getreceivedbyaddress "address" ( minconf )
+
+%listreceivedbyaddress ( minconf ) include_empty
+%listreceivedbyaddress 0 true %lists all addresses
+address_received(bitcoin, Address, Confirmations) ->
+    X = bitcoin("getreceivedbyaddress \"" ++ Address ++ "\" " ++ integer_to_list(Confirmations)),
+    jiffy:decode(X). % returns an integer
 block_txs(N) ->
     {ok, B} = talker:talk({block, 1, N}),
     B.
-block_txs(bitcoin, N) ->
+old_block_txs(bitcoin, N) ->
 % lookup txs from one block by height = getblock(getblockhash(height))
     io:fwrite("block_txs 0\n"),
     F = bitcoin("getblockhash " ++ integer_to_list(N)),
@@ -42,10 +49,11 @@ block_txs(bitcoin, N) ->
     io:fwrite("block_txs 3\n"),
     Txs = element(2, lists:nth(10, element(1, jiffy:decode(G)))),
     io:fwrite("block_txs 4\n"),
-    Tx = binary_to_list(hd(Txs)),
-    io:fwrite(Tx),
+    TxId = binary_to_list(hd(Txs)),
+    io:fwrite(TxId),
     io:fwrite("\n"),
-    bitcoin("gettransaction " ++ Tx).
+    ok.
+    %bitcoin("gettransaction " ++ Tx).
 %Txs.
 scan_history() -> 100.%when turning on the node with empty databases, how far back in the past do you include transactions from?
 pubkey() -> 
@@ -81,6 +89,8 @@ confirm_tx_period(veo) -> 40000.%in miliseconds.
 bitcoin_test() ->
 %[519291,"3JJCopJuEhAJreS4HDdxS2F2ZgZnubNfGh",<<>>]
     H = height(bitcoin),
+    A = new_address(bitcoin),
     [H,
-     new_address(bitcoin),
-     block_txs(bitcoin, H-50)].
+     A,
+     address_received(bitcoin, A, 0)].
+bitcoin_height_check_delay() -> 20.%seconds

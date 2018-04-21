@@ -17,13 +17,13 @@ handle_cast({trade, Trade}, X) ->
     X2 = dict:store(TID, Trade, X),
     id_lookup:add_veo(TID),
     {noreply, X2};
+handle_cast({erase, TID}, X) -> 
+    Y = dict:erase(TID, X),
+    {noreply, Y};
 handle_cast(_, X) -> {noreply, X}.
 handle_call(keys, _From, X) -> 
     K = dict:fetch_keys(X),
     {reply, K, X};
-handle_call({erase, TID}, _From, X) -> 
-    Y = dict:erase(TID, X),
-    {reply, Y, X};
 handle_call({read, TID}, _From, X) -> 
     Y = dict:find(TID, X),
     {reply, Y, X};

@@ -6,11 +6,8 @@ start(_StartType, _StartArgs) ->
     start_http(),
     veo_sync(),
     confirm_veo_cron(),
-    spawn(fun() ->
-                  timer:sleep(1000),
-                  %batches:start_cron(),
-		  ok
-          end),
+    bitcoin_height:update_cron(),
+    confirm_bitcoin_cron(),
     amoveo_exchange_sup:start_link().
 stop(_State) ->
     ok.
@@ -32,6 +29,12 @@ cvc() ->
     timer:sleep(config:confirm_tx_period(veo)),
     spawn(fun() -> unconfirmed_veo_feeder:confirm_all() end),
     cvc().
+confirm_bitcoin_cron() ->
+    spawn(fun() -> cbc() end).
+cbc() ->
+    timer:sleep(config:confirm_tx_period(bitcoin)),
+    spawn(fun() -> unconfirmed_bitcoin_feeder:confirm_all() end),
+    cbc().
 		  
 veo_sync() ->
     spawn(fun() -> veo_sync2() end).

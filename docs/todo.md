@@ -1,17 +1,9 @@
 ======= Erlang
 
-* making secure backed-up addresses for bitcoin.
-
-* config:height(bitcoin). needs to be implemented
+* we need to figure out how adding timers to each trade will work. If the trade isn't fully matched after enough time, then we take it out of the market and give a refund to whoever sent it.
 
 Write bitcoin stuff to mimic veo stuff:
-* write balance_bitcoin
--sync_internal/1
 -test/0
-* write unconfirmed_bitcoin
-* write unconfirmed_bitcoin_feeder
-* loading bitcoin into the order book.
-
 
 * matching trades in the order book.
 - cron job to periodically match trades in the order book.

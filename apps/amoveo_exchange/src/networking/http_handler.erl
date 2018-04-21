@@ -19,17 +19,18 @@ handle(Req, State) ->
 doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmount, TimeLimit}, IP) -> %sell or buy veo.
     %add it to the gen_server that waits for enough confirmations.
     ok = trade_limit:doit(IP),
-    Type = case N of
-	       2 -> unconfirmed_buy_veo;
-	       1 -> unconfirmed_sell_veo
+    {Type, NA} = case N of
+	       2 -> {unconfirmed_buy_veo, 0};
+	       1 -> {unconfirmed_sell_veo, 
+		     config:new_address(bitcoin)}
 	   end,
     TID = config:make_id(),
-    Trade = #trade{type = Type, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit, id = TID},
+    Trade = #trade{type = Type, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit, id = TID, server_bitcoin_address = NA},
     Addr = case N of
 	       2 -> unconfirmed_veo_feeder:trade(Trade),
 		    ServerVeoAddress = config:pubkey(),
 		    ServerVeoAddress;
-	       1 -> unconfirmed_bitcoin:trade(Trade),
+	       1 -> unconfirmed_bitcoin_feeder:trade(Trade),
 		    0%we need to return one of the server's bitcoin addresses here.
 	   end,
     {ok, [Addr, TID]};
