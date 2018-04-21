@@ -1,3 +1,4 @@
+
 -module(config).
 -compile(export_all).
 
@@ -53,7 +54,7 @@ confirmations() ->
 
 height(bitcoin) -> 
     X = bitcoin(<<"getblockcount">>, []),
-    X.
+    X;
 height(veo) -> 
     {ok, X} = talker:talk({height, 1}),
     max(0, X - confirmations()).
