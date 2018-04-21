@@ -5,6 +5,7 @@
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 	read/1, sync/0, reduce/2, test/0]).
+-include("records.hrl").
 init(ok) -> 
     D = #d{height = max(0, config:height(bitcoin) - config:scan_history()), 
 	   dict = dict:new()},
@@ -41,7 +42,7 @@ read(VA) -> gen_server:call(?MODULE, {read, VA}).
 sync() -> gen_server:cast(?MODULE, sync).
 
 %% internal functions
-sync_internal(X) -> ok.
+sync_internal(_) -> ok.
 
 
 test() ->

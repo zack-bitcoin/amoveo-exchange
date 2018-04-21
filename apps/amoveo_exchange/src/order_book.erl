@@ -1,16 +1,16 @@
 -module(order_book).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	 trade/1, time_since_last_batch/0, read/2,
+	 trade/1, time_since_last_batch/0, read/2, batch/0,
 	 check/0
 	]).
--record(d, {buy_veo = [], sell_veo = [], last_match_time}).
+-record(ob, {buy_veo = [], sell_veo = [], last_match_time}).
 -record(order, {trade, price}).
 -include("records.hrl").
 -define(File, "order_book.db").
 -define(Period, 1800).
 initial_state() ->
-    #d{last_match_time = erlang:timestamp()}.
+    #ob{last_match_time = erlang:timestamp()}.
 init(ok) ->
     A = case file:read_file(?File) of
 	    {error, enoent} -> initial_state();
@@ -26,10 +26,10 @@ code_change(_OldVsn, State, _Extra) -> {ok, State}.
 terminate(_, _) -> io:format("died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast({buy_veo, Trade}, X) -> 
-    X2 = X#d{buy_veo = internal_trade(Trade, X#d.buy_veo)},
+    X2 = X#ob{buy_veo = internal_trade(Trade, X#ob.buy_veo)},
     {noreply, X2};
 handle_cast({sell_veo, Trade}, X) -> 
-    X2 = X#d{sell_veo = internal_trade(Trade, X#d.sell_veo)},
+    X2 = X#ob{sell_veo = internal_trade(Trade, X#ob.sell_veo)},
     {noreply, X2};
 handle_cast(_, X) -> {noreply, X}.
 handle_call(check, _From, X) -> {reply, X, X};
@@ -48,17 +48,17 @@ check() ->
     gen_server:call(?MODULE, check).
 time_since_last_batch() ->
     D = check(),
-    Delta = timer:now_diff(erlang:timestamp(), D#d.last_match_time),
+    Delta = timer:now_diff(erlang:timestamp(), D#ob.last_match_time),
     %?Period - (Delta / 1000000).%in seconds.
     Delta / 1000000.%in seconds.
     
 read(buy_veo, TID) -> 
     X = check(),
-    Buys = X#d.buy_veo,
+    Buys = X#ob.buy_veo,
     read2(TID, Buys);
 read(sell_veo, TID) -> 
     X = check(),
-    Sells = X#d.sell_veo,
+    Sells = X#ob.sell_veo,
     read2(TID, Sells).
 read2(TID, [H|T]) ->
     TID2 = H#order.trade#trade.id,

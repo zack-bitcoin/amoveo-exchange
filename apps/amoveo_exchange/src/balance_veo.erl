@@ -6,7 +6,7 @@
 	 read/1, sync/0,
 	 reduce/2,%reduces how many veo are controlled by this account.
 	 test/0]).
--record(d, {height, dict}).
+-include("records.hrl").
 init(ok) -> 
     D = #d{height = max(0, config:height(veo) - config:scan_history()), 
 	   dict = dict:new()},

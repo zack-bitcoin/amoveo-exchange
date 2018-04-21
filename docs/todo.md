@@ -1,13 +1,8 @@
 ======= Erlang
 
-* config:height(bitcoin). needs to be implemented
+* making secure backed-up addresses for bitcoin.
 
-* run a bitcoin full node
-* in bitcoin.conf set prune=550.
- - this way we only keep track of the recent 550mb of blocks.
-* in bitcoin.conf set txindex=1
- - this way we can look up any tx.
- - costs about 11 gb
+* config:height(bitcoin). needs to be implemented
 
 Write bitcoin stuff to mimic veo stuff:
 * write balance_bitcoin
