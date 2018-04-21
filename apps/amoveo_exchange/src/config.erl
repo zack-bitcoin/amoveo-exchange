@@ -2,8 +2,8 @@
 -module(config).
 -compile(export_all).
 
-mode() -> test.
-%mode() -> production.
+%mode() -> test.
+mode() -> production.
 full_node() -> 
     TM = mode(),
     case TM of
