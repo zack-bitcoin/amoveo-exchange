@@ -2,8 +2,8 @@
 -module(config).
 -compile(export_all).
 
-%mode() -> test.
-mode() -> production.
+mode() -> test.
+%mode() -> production.
 full_node() -> 
     TM = mode(),
     case TM of
@@ -21,7 +21,8 @@ bitcoin(Command) ->
     F.
 new_address(bitcoin) ->
     X = bitcoin("getnewaddress"),
-    lists:reverse(tl(lists:reverse(binary_to_list(X)))).
+    jiffy:decode(X).
+%lists:reverse(tl(lists:reverse(binary_to_list(X)))).
 
 message_frequency() -> 1.
 trade_frequency() -> 0.2.
@@ -32,10 +33,13 @@ block_txs(bitcoin, N) ->
 % lookup txs from one block by height = getblock(getblockhash(height))
     F = bitcoin("getblockhash " ++ integer_to_list(N)),
 % <<"000000000000000004ec466ce4732fe6f1ed1cddc2ed4b328fff5224276e3f6f\n">>]
-    Y = lists:reverse(tl(lists:reverse(binary_to_list(F)))),
-    G = bitcoin("getblock \""++Y++"\""),
-    G.
-    
+    Y = jiffy:decode(F),
+    %Y = lists:reverse(tl(lists:reverse(binary_to_list(F)))),
+    G = bitcoin("getblock "++Y),
+    Txs = element(2, lists:nth(10, hd(jiffy:decode(G)))),
+    Tx = hd(Txs),
+    bitcoin("gettransaction " ++ Tx).
+%Txs.
 scan_history() -> 100.%when turning on the node with empty databases, how far back in the past do you include transactions from?
 pubkey() -> 
     {ok, P} = talker:talk({pubkey}),
@@ -50,8 +54,7 @@ confirmations() ->
 height(bitcoin) -> 
     X = bitcoin("getblockcount"),
    %<<"519291\n">>
-    Y = lists:reverse(tl(lists:reverse(binary_to_list(X)))),
-    list_to_integer(Y);
+    jiffy:decode(X);
 height(veo) -> 
     {ok, X} = talker:talk({height, 1}),
     max(0, X - confirmations()).
