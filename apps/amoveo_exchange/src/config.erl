@@ -40,7 +40,7 @@ block_txs(bitcoin, N) ->
     Y = lists:reverse(tl(lists:reverse(binary_to_list(F)))),
     G = bitcoin("getblock "++Y),
     io:fwrite("block_txs 3\n"),
-    Txs = element(2, lists:nth(10, hd(jiffy:decode(G)))),
+    Txs = element(2, lists:nth(10, hd(element(1, jiffy:decode(G))))),
     io:fwrite("block_txs 4\n"),
     Tx = hd(Txs),
     bitcoin("gettransaction " ++ Tx).
