@@ -31,12 +31,17 @@ block_txs(N) ->
     B.
 block_txs(bitcoin, N) ->
 % lookup txs from one block by height = getblock(getblockhash(height))
+    io:fwrite("block_txs 0\n"),
     F = bitcoin("getblockhash " ++ integer_to_list(N)),
 % <<"000000000000000004ec466ce4732fe6f1ed1cddc2ed4b328fff5224276e3f6f\n">>]
+    io:fwrite("block_txs 1\n"),
     Y = jiffy:decode(F),
+    io:fwrite("block_txs 2\n"),
     %Y = lists:reverse(tl(lists:reverse(binary_to_list(F)))),
     G = bitcoin("getblock "++Y),
+    io:fwrite("block_txs 3\n"),
     Txs = element(2, lists:nth(10, hd(jiffy:decode(G)))),
+    io:fwrite("block_txs 4\n"),
     Tx = hd(Txs),
     bitcoin("gettransaction " ++ Tx).
 %Txs.
