@@ -21,8 +21,8 @@ bitcoin(Command) ->
     F.
 new_address(bitcoin) ->
     X = bitcoin("getnewaddress"),
-    jiffy:decode(X).
-%lists:reverse(tl(lists:reverse(binary_to_list(X)))).
+    %jiffy:decode(X).
+    lists:reverse(tl(lists:reverse(binary_to_list(X)))).
 
 message_frequency() -> 1.
 trade_frequency() -> 0.2.
