@@ -19,7 +19,7 @@ bitcoin_json(Command, Params) when
       {<<"method">>,Command},
       {<<"params">>,Params}]}.
 
-bitcoin(Command, Params) ->
+bitcoin_old(Command, Params) ->
     J = bitcoin_json(Command, Params),
     S = binary_to_list(jiffy:encode(J)),
     C = "curl --user user --data-binary '" ++ S ++ "' -H 'content-type: text/plain;' http://127.0.0.1:8332/ > temp",
@@ -36,8 +36,17 @@ bitcoin(Command, Params) ->
     %F2 = jiffy:decode(F),
     %F2.
     F.
+bitcoin(Command) ->
+    C = "bitcoin-cli " ++ Command ++ " > temp",
+    os:cmd(C),
+    timer:sleep(200),
+    {ok, F} = file:read_file("temp"),
+    io:fwrite("binary json is "),
+    io:fwrite(F),
+    io:fwrite("\n"),
+    F.
 new_address(bitcoin) ->
-    X = bitcoin(<<"getnewaddress">>, []),
+    X = bitcoin("getnewaddress"),
     X.
 
 message_frequency() -> 1.
@@ -47,7 +56,7 @@ block_txs(N) ->
     B.
 block_txs(bitcoin, N) ->
 % lookup txs from one block by height = getblock(getblockhash(height))
-    F = bitcoin(<<"getblockhash">>, [N]),
+    F = bitcoin("getblockhash " ++ integer_to_list(N)),
     F.
     
 scan_history() -> 100.%when turning on the node with empty databases, how far back in the past do you include transactions from?
@@ -62,7 +71,7 @@ confirmations() ->
     end.
 
 height(bitcoin) -> 
-    X = bitcoin(<<"getblockcount">>, []),
+    X = bitcoin("getblockcount"),
     X;
 height(veo) -> 
     {ok, X} = talker:talk({height, 1}),
