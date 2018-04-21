@@ -33,7 +33,7 @@ block_txs(bitcoin, N) ->
     F = bitcoin("getblockhash " ++ integer_to_list(N)),
 % <<"000000000000000004ec466ce4732fe6f1ed1cddc2ed4b328fff5224276e3f6f\n">>]
     Y = lists:reverse(tl(lists:reverse(binary_to_list(F)))),
-    G = bitcoin("getblock "++Y),
+    G = bitcoin("getblock \""++Y++"\""),
     G.
     
 scan_history() -> 100.%when turning on the node with empty databases, how far back in the past do you include transactions from?
@@ -69,9 +69,7 @@ confirm_tx_period(veo) -> 40000.%in miliseconds.
     
 
 bitcoin_test() ->
-%[<<"519291\n">>,
-%<<"3NenWVjVX15nyR6yuBPy7ExeFUgHGshjss\n">>,
-% <<"000000000000000004ec466ce4732fe6f1ed1cddc2ed4b328fff5224276e3f6f\n">>]
+%[519291,"3JJCopJuEhAJreS4HDdxS2F2ZgZnubNfGh",<<>>]
 
     [height(bitcoin),
      new_address(bitcoin),
