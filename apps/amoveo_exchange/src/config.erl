@@ -22,7 +22,7 @@ bitcoin_json(Command, Params) when
 bitcoin(Command, Params) ->
     J = bitcoin_json(Command, Params),
     S = binary_to_list(jiffy:encode(J)),
-    C = "curl --user user --data-binary " ++ S ++ " -H 'content-type: text/plain;' http://127.0.0.1:8332/ > temp",
+    C = "curl --user user --data-binary '" ++ S ++ "' -H 'content-type: text/plain;' http://127.0.0.1:8332/ > temp",
     io:fwrite("shell command: "),
     io:fwrite(C),
     io:fwrite("\n"),
