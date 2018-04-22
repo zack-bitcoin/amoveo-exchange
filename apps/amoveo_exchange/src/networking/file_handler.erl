@@ -12,6 +12,9 @@ handle(Req, _) ->
     true = case F of
                <<"/favicon.ico">> -> true;
                <<"/server.js">> -> true;
+               <<"/format.js">> -> true;
+               <<"/status.js">> -> true;
+               <<"/trade.js">> -> true;
                <<"/rpc.js">> -> true;
                <<"/main.html">> -> true;
                X -> 
