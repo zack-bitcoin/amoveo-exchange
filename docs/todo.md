@@ -13,6 +13,10 @@ run tests for unconfirmed_bitcoin and balance_bitcoin
 
 * in order_book.erl we should write the code for paying the veo and bitcoin for matched trades. (make sure each payment happens in a spawned function. If the gen_server crashes mid-way through making these payments, we could lose all the customer funds.)
 
+* move a bunch of functions in config.erl to other modules. There are notes in config.erl.
+
+* make a cold bitcoin and cold veo address for the config.erl file
+
 ======= JS
 
 use the api commands:
