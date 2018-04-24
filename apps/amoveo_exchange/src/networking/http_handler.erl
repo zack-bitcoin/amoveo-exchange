@@ -18,6 +18,10 @@ handle(Req, State) ->
 
 doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmount, TimeLimit}, IP) -> %sell or buy veo.
     %add it to the gen_server that waits for enough confirmations.
+    true = 0 < BitcoinAmount,
+    true = 0 < VeoAmount,
+    true = is_integer(BitcoinAmount),
+    true = is_integer(VeoAmount),
     ok = trade_limit:doit(IP),
     {Type, NA} = case N of
 	       2 -> {unconfirmed_buy_veo, 0};

@@ -9,8 +9,6 @@ run tests for unconfirmed_bitcoin and balance_bitcoin
 
 * it should occasionally move the profit to cold storage. We need to keep a record of how much of the money in the full node is needed to cover trades, and how much we can move to cold storage.
 
-* make sure that trade amounts must always be >0, otherwise they could use divide by zero errors to make it crash.
-
 ======= JS
 
 use the 2 api commands:
