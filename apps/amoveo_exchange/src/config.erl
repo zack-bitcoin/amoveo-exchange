@@ -2,8 +2,8 @@
 -module(config).
 -compile(export_all).
 
-%mode() -> test.
-mode() -> production.
+mode() -> test.
+%mode() -> production.
 full_node() -> 
     TM = mode(),
     case TM of
@@ -94,3 +94,4 @@ bitcoin_test() ->
      A,
      address_received(bitcoin, A, 0)].
 bitcoin_height_check_delay() -> 20.%seconds
+batch_period() -> 1800.%in seconds
