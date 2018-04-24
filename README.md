@@ -7,6 +7,7 @@ This is a work in progress. It does not yet function as an exchange.
 This is an exchange written for trades between bitcoin and amoveo.
 
 [installation](docs/installation.md)
+
 [turn it on](docs/boot_up.md)
 
 The order book matches trades in single-price batches.
