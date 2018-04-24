@@ -11,12 +11,9 @@ run tests for unconfirmed_bitcoin and balance_bitcoin
 
 ======= JS
 
-use the 2 api commands:
+use the api commands:
 * make a trade
 * look up a trade's status by ID.
+* display a chart of open trades in the market
 
-use the open orders api to draw graphs.
-
-====== API
-
-* look up open orders in the order book.
+maybe use the open orders api to draw graphs.

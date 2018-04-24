@@ -41,8 +41,13 @@ trade(Trade) ->
 	    gen_server:cast(?MODULE, {sell_veo, Trade})
     end.
 check() ->
-    gen_server:call(?MODULE, check).
-    
+    OB = gen_server:call(?MODULE, check),
+    Buy = OB#ob.buy_veo,
+    Sell = OB#ob.sell_veo,
+    {market_data, check_trades(Buy), check_trades(Sell)}.
+check_trades([]) -> [];
+check_trades([H|T]) -> 
+    [H#order.trade|check_trades(T)].
 read(buy_veo, TID) -> 
     X = check(),
     Buys = X#ob.buy_veo,
