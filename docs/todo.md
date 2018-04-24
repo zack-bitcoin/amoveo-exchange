@@ -9,6 +9,8 @@ run tests for unconfirmed_bitcoin and balance_bitcoin
 
 * it should occasionally move the profit to cold storage. We need to keep a record of how much of the money in the full node is needed to cover trades, and how much we can move to cold storage.
 
+* in order_book.erl we should write the code for paying the veo and bitcoin for matched trades. (make sure each payment happens in a spawned function. If the gen_server crashes mid-way through making these payments, we could lose all the customer funds.)
+
 ======= JS
 
 use the api commands:
