@@ -14,7 +14,7 @@ handle_cast({trade, Trade}, X) ->
     TID = Trade#trade.id,
     X2 = dict:store(TID, Trade, X),
     id_lookup:add_veo(TID),
-    {noreply, X};
+    {noreply, X2};
 handle_cast({erase, TID}, X) -> 
     Y = dict:erase(TID, X),
     {noreply, Y};
@@ -47,7 +47,7 @@ confirm(TID) ->
 	true -> 
 	    id_lookup:confirm(TID),
 	    balance_bitcoin:reduce(TA, VA),
-	    T = 4,
+	    T = 3,
 	    unmatched_buy_veo = id_lookup:number_to_type(T),
 	    Trade2 = Trade#trade{type = T},%change to type unmatched_buy_veo
 	    order_book:trade(Trade2),

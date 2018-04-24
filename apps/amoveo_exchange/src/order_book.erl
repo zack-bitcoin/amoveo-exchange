@@ -4,36 +4,32 @@
 	 trade/1, read/2, batch_cron/0, check/0,
 	 test/0
 	]).
--record(ob, {buy_veo = [], sell_veo = []}).
 -record(order, {trade, price}).
 -include("records.hrl").
--define(File, "order_book.db").
-initial_state() -> #ob{}.
-init(ok) ->
-    A = case file:read_file(?File) of
-	    {error, enoent} -> initial_state();
-	    {ok, B} ->
-		case B of
-		    "" -> initial_state();
-		    _ -> binary_to_term(B)
-		end
-	end,
-    {ok, A}.
+init(ok) -> {ok, []}.
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 terminate(_, _) -> io:format("died!"), ok.
 handle_info(_, X) -> {noreply, X}.
-handle_cast({buy_veo, Trade}, X) -> 
+handle_cast({buy_veo, Trade}, _) -> 
+    X = order_book_data:read(),
     X2 = X#ob{buy_veo = internal_trade(Trade, X#ob.buy_veo)},
-    {noreply, X2};
-handle_cast({sell_veo, Trade}, X) -> 
+    order_book_data:write(X2),
+    {noreply, []};
+handle_cast({sell_veo, Trade}, _) -> 
+    X = order_book_data:read(),
     X2 = X#ob{sell_veo = internal_trade(Trade, X#ob.sell_veo)},
-    {noreply, X2};
-handle_cast(batch, X) ->
+    order_book_data:write(X2),
+    {noreply, []};
+handle_cast(batch, _) ->
+    X = order_book_data:read(),
     X2 = internal_batch(X#ob.buy_veo, X#ob.sell_veo, [], [], 0, 0),
-    {noreply, X2};
+    order_book_data:write(X2),
+    {noreply, []};
 handle_cast(_, X) -> {noreply, X}.
-handle_call(check, _From, X) -> {reply, X, X};
+handle_call(check, _From, _) -> 
+    X = order_book_data:read(),
+    {reply, X, []};
 handle_call(_, _From, X) -> {reply, X, X}.
 
 trade(Trade) ->

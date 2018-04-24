@@ -2,9 +2,6 @@
 
 * we need to figure out how adding timers to each trade will work. If the trade isn't fully matched after enough time, then we take it out of the market and give a refund to whoever sent it.
 
-* the order book needs to be split into 2 gen_servers, that way one of them can safely crash without deleting the order book data.
-
-
 run tests for unconfirmed_bitcoin and balance_bitcoin
 
 * keep a backup of all gen_server data to the hard drive

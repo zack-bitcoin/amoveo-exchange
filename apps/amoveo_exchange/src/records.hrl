@@ -9,3 +9,4 @@
 		server_bitcoin_address = 0}).
 
 -record(d, {height, dict}).
+-record(ob, {buy_veo = [], sell_veo = []}).
