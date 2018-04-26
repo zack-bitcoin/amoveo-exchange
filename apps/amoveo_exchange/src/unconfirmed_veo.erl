@@ -7,10 +7,15 @@
 	 confirm/1, %attempts to confirm a single trade.
 	 test/0]).
 -include("records.hrl").
-init(ok) -> {ok, dict:new()}.
+-define(LOC, config:file(?MODULE)).
+init(ok) -> 
+    process_flag(trap_exit, true),
+    utils:init(dict:new(), ?LOC).
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
-terminate(_, _) -> io:format("died!"), ok.
+terminate(_, X) -> 
+    utils:save(X, ?LOC),
+    io:format("unconfirmed veo died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast({trade, Trade}, X) -> 
     TID = Trade#trade.id,

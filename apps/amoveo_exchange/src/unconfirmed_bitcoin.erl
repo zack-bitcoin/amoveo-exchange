@@ -5,10 +5,15 @@
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 	read/1, trade/1, confirm/1, keys/0]).
 -include("records.hrl").
-init(ok) -> {ok, dict:new()}.
+-define(LOC, config:file(?MODULE)).
+init(ok) -> 
+    process_flag(trap_exit, true),
+    utils:init(dict:new(), ?LOC).
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
-terminate(_, _) -> io:format("died!"), ok.
+terminate(_, X) -> 
+    utils:save(X, ?LOC),
+    io:format("unconfirmed bitcoin died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast({trade, Trade}, X) -> 
     TID = Trade#trade.id,

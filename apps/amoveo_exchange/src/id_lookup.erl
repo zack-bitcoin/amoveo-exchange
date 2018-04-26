@@ -11,10 +11,15 @@
 -define(wait_confirmations, <<"waiting for confirmations">>).
 -define(wait_confirmations_sell, <<"waiting for confirmations to sell veo">>).
 -define(in_order_book, <<"trade in order book">>).
-init(ok) -> {ok, dict:new()}.
+-define(LOC, config:file(?MODULE)).
+init(ok) -> 
+    process_flag(trap_exit, true),
+    utils:init(dict:new(), ?LOC).
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
-terminate(_, _) -> io:format("died!"), ok.
+terminate(_, X) -> 
+    utils:save(X, ?LOC),
+    io:format("id lookup died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast({add_veo, ID}, X) -> 
     Y = dict:store(ID, 1, X),
@@ -50,14 +55,20 @@ read(ID) ->
     X = id_to_type(ID),
     case number_to_type(X) of
 	empty -> [?not_exist];
-	unconfirmed_buy_veo -> 
+	unconfirmed_sell_veo -> 
 	    Fee = config:fee(veo),
 	    {ok, Trade} = unconfirmed_veo:read(ID),
 	    VA = Trade#trade.veo_address,
 	    TA = Trade#trade.veo_amount + Fee,
 	    B = balance_veo:read(VA),
 	    [?wait_confirmations, B, TA, Trade];
-	unconfirmed_sell_veo -> [?wait_confirmations_sell, 0];
+	unconfirmed_buy_veo -> 
+	    Fee = config:fee(bitcoin),
+	    {ok, Trade} = unconfirmed_bitcoin:read(ID),
+	    VA = Trade#trade.server_bitcoin_address,
+	    TA = Trade#trade.veo_amount + Fee,
+	    B = balance_veo:read(VA),
+	    [?wait_confirmations_sell, B, TA, Trade];
 	unmatched_buy_veo -> 
 	    Trade = order_book:read(buy_veo, ID),
 	    [?in_order_book, Trade];

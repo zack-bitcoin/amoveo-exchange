@@ -17,7 +17,8 @@ fee(veo) -> 7000000;%in satoshis
 fee(bitcoin) -> 70000.%in satoshis
 make_id() -> crypto:strong_rand_bytes(32).
 sync_block_period(veo) -> 40000.%in miliseconds.
-confirm_tx_period(veo) -> 40000.%in miliseconds.
+confirm_tx_period(veo) -> 40000;%in miliseconds.
+confirm_tx_period(bitcoin) -> 40000.%in miliseconds.
 bitcoin_height_check_delay() -> 20.%seconds
 batch_period() -> 1800.%in seconds
 scan_history() -> 100.%when turning on the node with empty databases, how far back in the past do you include transactions from?
@@ -29,6 +30,9 @@ full_node() ->
 	test -> "http://localhost:3011/";
 	_ -> "http://localhost:8081/"
     end.
+id_lookup_file() -> "id_lookup.db".
+file(X) -> atom_to_list(X).
+
 
 %=========== everything below this line should be in a different module.
 

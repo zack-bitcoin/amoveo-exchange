@@ -4,21 +4,16 @@
 	read/0,
 	write/1]).
 -include("records.hrl").
--define(File, "order_book.db").
-initial_state() -> #ob{}.
+-define(LOC, config:file(?MODULE)).
 init(ok) -> 
-    A = case file:read_file(?File) of
-	    {error, enoent} -> initial_state();
-	    {ok, B} ->
-		case B of
-		    "" -> initial_state();
-		    _ -> binary_to_term(B)
-		end
-	end,
-    {ok, A}.
+    process_flag(trap_exit, true),
+    utils:init(#ob{}, ?LOC).
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
-terminate(_, _) -> io:format("died!"), ok.
+terminate(_, X) -> 
+    utils:save(X, ?LOC),
+    io:format("order book data died!"), 
+    ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast({write, X}, _) -> {noreply, X};
 handle_cast(_, X) -> {noreply, X}.

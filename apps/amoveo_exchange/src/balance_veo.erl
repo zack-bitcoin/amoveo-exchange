@@ -7,13 +7,18 @@
 	 reduce/2,%reduces how many veo are controlled by this account.
 	 test/0]).
 -include("records.hrl").
+-define(LOC, config:file(?MODULE)).
 init(ok) -> 
+    process_flag(trap_exit, true),
     D = #d{height = max(0, config:height(veo) - config:scan_history()), 
 	   dict = dict:new()},
-    {ok, D}.
+    utils:init(D, ?LOC).
+%{ok, D}.
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
-terminate(_, _) -> io:format("died!"), ok.
+terminate(_, X) -> 
+    utils:save(X, ?LOC),
+    io:format("balance veo died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast({reduce, Amount, VA}, X) -> 
     Dict = X#d.dict,

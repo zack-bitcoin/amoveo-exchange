@@ -8,4 +8,5 @@ There are many other variables in this file which you might want to customize fo
 
 
 WARNING
+Make a new unused amoveo address for your exchange.
 If you delete the files on your hard drive to restart the exchange with an empty order book, make sure to generate a new address for your amoveo node. make sure not to reuse an old address. Otherwise you could lose customer funds.

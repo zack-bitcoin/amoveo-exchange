@@ -6,15 +6,17 @@
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 	read/1, reduce/2, test/0]).
 -include("records.hrl").
-init(ok) -> 
-%    D = #d{height = max(0, config:height(bitcoin) - config:scan_history()), 
-%	   dict = dict:new()},
-    {ok, dict:new()}.
+-define(LOC, config:file(?MODULE)).
 -record(acc, {received = 0, spent = 0, height = 0}).%received is the total amount of bitcoin sent to this account for the height
 %spent is how many of these have either been spent in trades, or been refunded to the customer.
+init(ok) -> 
+    process_flag(trap_exit, true),
+    utils:init(dict:new(), ?LOC).
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
-terminate(_, _) -> io:format("died!"), ok.
+terminate(_, X) -> 
+    utils:save(X, ?LOC),
+    io:format("balance bitcoin died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast({reduce, Amount, VA}, Dict) -> 
     X2 = case dict:find(VA, Dict) of
