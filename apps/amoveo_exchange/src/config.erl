@@ -31,4 +31,4 @@ full_node() ->
 	_ -> "http://localhost:8081/"
     end.
 id_lookup_file() -> "id_lookup.db".
-file(X) -> atom_to_list(X).
+file(X) -> atom_to_list(X) ++ ".db".
