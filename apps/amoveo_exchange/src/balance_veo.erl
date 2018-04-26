@@ -10,7 +10,7 @@
 -define(LOC, config:file(?MODULE)).
 init(ok) -> 
     process_flag(trap_exit, true),
-    D = #d{height = max(0, config:height(veo) - config:scan_history()), 
+    D = #d{height = max(0, utils:height(veo) - config:scan_history()), 
 	   dict = dict:new()},
     utils:init(D, ?LOC).
 %{ok, D}.
@@ -51,12 +51,12 @@ sync() -> gen_server:cast(?MODULE, sync).
 %% internal functions
 sync_internal(X) ->
     MyHeight = X#d.height,
-    NodeHeight = config:height(veo),
+    NodeHeight = utils:height(veo),
     if
 	MyHeight >= NodeHeight -> X;
 	true ->
-	    Txs = tl(config:block_txs(MyHeight + 1)),%ignore coinbase tx.
-	    VMe = config:pubkey(),
+	    Txs = tl(utils:block_txs(MyHeight + 1)),%ignore coinbase tx.
+	    VMe = utils:pubkey(),
 	    Dict2 = sync_block(X#d.dict, VMe, Txs),
 	    X2 = X#d{dict = Dict2, height = MyHeight + 1},
 	    sync_internal(X2)
@@ -66,16 +66,16 @@ sync_block(Dict, VMe, [H|T]) ->
     Tx = element(2, H),%remove signature.
     Dict2 = case element(1, Tx) of
 	     spend ->
-		 VT = config:spend_to(veo, Tx),
+		 VT = utils:spend_to(veo, Tx),
 		 if
 		     VT == VMe -> %spends to the server.
-			 VA = config:spend_from(veo, Tx),
+			 VA = utils:spend_from(veo, Tx),
 			 D = 
 			     case dict:find(VA, Dict) of
 				 {ok, Y} -> Y;
 				 error -> 0
 			     end,
-			 B = config:spend_amount(veo, Tx),
+			 B = utils:spend_amount(veo, Tx),
 			 NewAmount = D + B,
 			 dict:store(VA, NewAmount, Dict);
 		     true -> Dict

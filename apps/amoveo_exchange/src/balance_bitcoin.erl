@@ -35,7 +35,7 @@ handle_call({read, VA, Height}, _From, Dict) ->
 		H2 = Y#acc.height,
 		if
 		    H2 < Height ->
-			B = config:address_received(bitcoin, VA, config:confirmations()),
+			B = utils:address_received(bitcoin, VA, config:confirmations()),
 			Y2 = Y#acc{height = Height, received = B},
 			{Y2, dict:store(VA, Y2, Dict)};
 		    true -> {Y, Dict}
