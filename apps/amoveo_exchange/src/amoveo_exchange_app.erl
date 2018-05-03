@@ -8,6 +8,8 @@ start(_StartType, _StartArgs) ->
     confirm_veo_cron(),
     bitcoin_height:update_cron(),
     confirm_bitcoin_cron(),
+    profit_bitcoin:cron(),
+    profit_veo:cron(),
     amoveo_exchange_sup:start_link().
 stop(_State) ->
     ok.

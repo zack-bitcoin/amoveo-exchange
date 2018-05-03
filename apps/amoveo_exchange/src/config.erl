@@ -3,10 +3,10 @@
 
 mode() -> test.
 %mode() -> production.
-cold_bitcoin() ->
-    <<>>.%this is the bitcoin address where we send our bitcoin profit.
-cold_veo() ->
-    <<>>.%this is the veo address where we send our veo profit.
+cold(bitcoin) -> %this is the bitcoin address where we send our bitcoin profit.
+    <<"1C5Qq5i4uUyEm84GAZ3iAUFgbVAhbCirwj">>;
+cold(veo) -> %this is the veo address where we send our veo profit.
+    <<"BGH+3P768A9cSNR3GLSRXgsokSL/Jdbm+rOJogbgiPxq8M+J2R4nVxZ+Hj6WdI4rMsq6nPzkMh77WGBCMx89HUM=">>.
 message_frequency() -> 1.%this is how often each ip address can check the status of a trade.
 trade_frequency() -> 0.2.%this is how often each ip address can put trades into the order book.
 market_data_frequency() -> 3.%this is how often each ip address can look up the open orders from the order book.
@@ -34,3 +34,14 @@ full_node() ->
 id_lookup_file() -> "id_lookup.db".
 file(X) -> atom_to_list(X) ++ ".db".
 trade_time_limit() -> 12 * 60 * 60.%12 hours in seconds
+profit_check_period(bitcoin) ->
+    5000;%every 5 seconds
+profit_check_period(veo) ->
+    5000.
+profit_limit(bitcoin) ->%in satoshis
+    1000000;%10 milibits
+%bitcoin fee size is about 16000
+profit_limit(veo) ->% in satoshi
+    20000000.%0.2 veo
+%fee is about 152000
+    
