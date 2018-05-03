@@ -5,7 +5,6 @@
 
 run tests for unconfirmed_bitcoin and balance_bitcoin
 
-a command to update the backups without shutting off.
 
 * it should occasionally move the profit to cold storage. We need to keep a record of how much of the money in the full node is needed to cover trades, and how much we can move to cold storage.
 - every time a trade is funded, add the fee to our profit gen_server.
@@ -16,7 +15,7 @@ a command to update the backups without shutting off.
 
 * make a cold bitcoin and cold veo address for the config.erl file
 
-* make the message_limit in http_handler for market_data more strict. We don't want to send so much data too frequently.
+* a command to update the backups without shutting off.
 
 * it would be nice if users could cancel their trades. Maybe they should send a signed message, or maybe they should send a payment of exactly 1 satoshi.
 - maybe the light node should have a feature to sign messages?

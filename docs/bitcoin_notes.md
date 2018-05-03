@@ -1,4 +1,3 @@
-
 * run a bitcoin full node
 * in bitcoin.conf set prune=550.
  - this way we only keep track of the recent 550mb of blocks.
