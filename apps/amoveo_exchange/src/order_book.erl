@@ -158,6 +158,7 @@ payout_sells([H|T], BA, SA) ->
     io:fwrite(" to: "),
     io:fwrite(H#order.trade#trade.bitcoin_address),
     io:fwrite("\n"),
+    utils:spend(bitcoin, H#order.trade#trade.bitcoin_address, B),
     payout_sells(T, BA, SA).
 payout_buys([], _, _) -> ok;
 payout_buys(_, 0, _) -> error;
@@ -170,6 +171,7 @@ payout_buys([H|T], BA, SA) ->
     io:fwrite(" to: "),
     io:fwrite(H#order.trade#trade.veo_address),
     io:fwrite("\n"),
+    utils:spend(veo, H#order.trade#trade.veo_address, V),
     payout_buys(T, BA, SA).
     
 	    

@@ -57,7 +57,16 @@ height(veo) -> %move this func to a different module
 spend_from(veo, Tx) -> element(2, Tx).
 spend_to(veo, Tx) -> element(5, Tx).
 spend_amount(veo, Tx) -> element(6, Tx).
-   
+ 
+spend(Type, To, Amount) -> 
+    spawn(fun() -> spend2(Type, To, Amount) end).
+spend2(veo, To, Amount) -> 
+    Msg = {spend, To, Amount},
+    talker:talk_helper(Msg);
+spend2(bitcoin, To, Amount) ->
+    X = bitcoin("sendtoaddress " ++ To ++ " " ++ integer_to_list(Amount)),
+    jiffy:decode(X).
+    
 
 bitcoin_test() ->
 %[519291,"3JJCopJuEhAJreS4HDdxS2F2ZgZnubNfGh",<<>>]

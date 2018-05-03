@@ -5,13 +5,13 @@
 
 run tests for unconfirmed_bitcoin and balance_bitcoin
 
+test to make sure utils:spend/3 is working.
+test that order_book pays out the purchased currency.
+
 
 * it should occasionally move the profit to cold storage. We need to keep a record of how much of the money in the full node is needed to cover trades, and how much we can move to cold storage.
 - every time a trade is funded, add the fee to our profit gen_server.
 - if the profit gets high enough, then spend some of it to cold storage.
-
-* in order_book.erl we need the code for paying the veo and bitcoin for matched trades. (make sure each payment happens in a spawned function. If the gen_server crashes mid-way through making these payments, we could lose all the customer funds.)
-- spend functions should be in utils, so we can reuse the same functions for moving profit to cold storage.
 
 * make a cold bitcoin and cold veo address for the config.erl file
 
