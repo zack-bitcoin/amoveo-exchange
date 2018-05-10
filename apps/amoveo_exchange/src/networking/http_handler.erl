@@ -29,13 +29,14 @@ doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmou
 		     utils:new_address(bitcoin)}
 	   end,
     TID = config:make_id(),
-    Trade = #trade{type = Type, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit, id = TID, server_bitcoin_address = NA},
+    TimeLimit2 = {erlang:timestamp(), TimeLimit},
+    Trade = #trade{type = Type, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit2, id = TID, server_bitcoin_address = NA},
     Addr = case N of
 	       2 -> unconfirmed_veo_feeder:trade(Trade),
 		    ServerVeoAddress = utils:pubkey(),
 		    ServerVeoAddress;
 	       1 -> unconfirmed_bitcoin_feeder:trade(Trade),
-		    0%we need to return one of the server's bitcoin addresses here.
+		    NA
 	   end,
     {ok, [Addr, TID]};
 doit({exist, TID}, IP) -> %check the status of your order

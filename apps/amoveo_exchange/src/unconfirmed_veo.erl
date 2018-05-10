@@ -5,6 +5,7 @@
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 	 read/1, trade/1, keys/0,
 	 confirm/1, %attempts to confirm a single trade.
+	 stale_refunds/1,
 	 test/0]).
 -include("records.hrl").
 -define(LOC, config:file(?MODULE)).
@@ -61,8 +62,22 @@ confirm(TID) ->
 	    order_book:trade(Trade2),
 	    io:fwrite("removing trade\n"),
 	    gen_server:cast(?MODULE, {erase, TID})
-%remove(TID)
     end.
+stale_refunds(TID) ->
+    {ok, Trade} = read(TID),
+    {ETS, Seconds} = Trade#trade.time_limit,
+    S = erlang:now_diff(erlang:timestamp(), ETS),
+    if
+	((S div 1000000) > Seconds) ->
+	    VA = Trade#trade.veo_address,
+	    Amount = balance_veo:read(VA),
+	    Fee = config:fee(veo),
+	    balace_veo:reduce(Amount, VA),
+	    utils:spend(veo, VA, Amount - Fee),
+	    gen_server:cast(?MODULE, {erase, TID});
+	true -> ok
+    end.
+    
 
 test() ->
     balance_veo:sync(),

@@ -5,7 +5,9 @@ start(_StartType, _StartArgs) ->
     inets:start(),
     start_http(),
     veo_sync(),
-    confirm_veo_cron(),
+    unconfirmed_veo_feeder:confirm_veo_cron(),
+    unconfirmed_veo_feeder:stale_trades_cron(),
+    unconfirmed_bitcoin_feeder:stale_trades_cron(),
     bitcoin_height:update_cron(),
     confirm_bitcoin_cron(),
     profit_bitcoin:cron(),
@@ -25,12 +27,6 @@ start_http() ->
                 [{ip, {0, 0, 0, 0}}, {port, Port}],
                 [{env, [{dispatch, Dispatch}]}]),
     ok.
-confirm_veo_cron() ->
-    spawn(fun() -> cvc() end).
-cvc() ->
-    timer:sleep(config:confirm_tx_period(veo)),
-    spawn(fun() -> unconfirmed_veo_feeder:confirm_all() end),
-    cvc().
 confirm_bitcoin_cron() ->
     spawn(fun() -> cbc() end).
 cbc() ->

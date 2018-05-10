@@ -2,14 +2,20 @@
 
 * we need to figure out how adding timers to each trade will work. If the trade isn't fully matched after enough time, then we take it out of the market and give a refund to whoever sent it.
 - There should probably be a 12 hour max we store the trade on the server until we give a refund. it is a config.erl variable.
-- trades can also go stale in the unconfirmed step. If they are partially funded, we should send a refund.
- * What if there are unconfirmed payments at the same time a trade goes stale? We should probably let the trade exist longer until there are no unconfirmed payments, then pay the refund.
+- we also need a minimum time period that is much longer than how long it takes for transactions to confirm. We can reduce this time period once trades refuse to go stale while unconfirmed txs exist.
+ * make a cron job to keep checking if any trades have gone stale.
+
+* detailed instructions on how to use this tools for trading.
+
+* keep a record every time veo_balance or bitcoin_balance have income. Keep a record every time we pay a customer. These records can be used to know who owns which money if something goes wrong.
 
 run tests for unconfirmed_bitcoin and balance_bitcoin
 
 test to make sure utils:spend/3 is working.
 test that order_book pays out the purchased currency.
 test to make sure that profit_veo and profit_bitcoin are correctly sending the profit to cold storage.
+
+* run lots of checks on input to api to make sure it is impossible to crash the order_book.erl gen_server. which could cause loss of customer funds.
 
 
 ======= JS
@@ -31,3 +37,8 @@ use the api commands:
 * look up what the current trading fees are
 - api
 - javascript
+
+
+* What if there are unconfirmed payments at the same time a trade goes stale? We should probably let the trade exist longer until there are no unconfirmed payments, then pay the refund.
+
+* consider the case where someone pays us more veo/bitcoin than the trade had said. We should give them a refund of the excess money they sent to us.
