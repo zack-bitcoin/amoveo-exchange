@@ -2,6 +2,7 @@
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
 	 trade/1, read/2, batch_cron/0, check/0,
+	 stale_cron/0,
 	 test/0
 	]).
 -record(order, {trade, price}).
@@ -26,12 +27,30 @@ handle_cast(batch, _) ->
     X2 = internal_batch(X#ob.buy_veo, X#ob.sell_veo, [], [], 0, 0),
     order_book_data:write(X2),
     {noreply, []};
+handle_cast(stale_trades, _) ->
+    X = order_book_data:read(),
+    {B1, BV} = internal_stale(X#ob.buy_veo),%B1 is the stale trades.
+    internal_refund(bitcoin, B1),
+    {S1, SV} = internal_stale(X#ob.sell_veo),
+    internal_refund(veo, S1),
+    X2 = X#ob{buy_veo = BV, sell_veo = SV},
+    order_book_data:write(X2),
+    {noreply, []};
 handle_cast(_, X) -> {noreply, X}.
 handle_call(check, _From, _) -> 
     X = order_book_data:read(),
     {reply, X, []};
 handle_call(_, _From, X) -> {reply, X, X}.
 
+stale_trades() ->
+    gen_server:cast(?MODULE, stale_trades).
+stale_cron() ->
+    spawn(fun() -> stale_cron2() end).
+stale_cron2() ->
+    timer:sleep(config:order_book_stale_period()),
+    stale_trades(),
+    stale_cron2().
+		  
 trade(Trade) ->
     T = id_lookup:number_to_type(Trade#trade.type),
     case T of 
@@ -67,7 +86,8 @@ batch_cron() ->
     spawn(fun() -> batch_cron2() end).
 batch_cron2() ->
     timer:sleep(config:batch_period() * 1000),
-    batch().
+    batch(),
+    batch_cron2().
 batch() ->
     gen_server:cast(?MODULE, batch).
 
@@ -174,8 +194,38 @@ payout_buys([H|T], BA, SA) ->
     utils:spend(veo, H#order.trade#trade.veo_address, V),
     payout_buys(T, BA, SA).
     
-	    
-	    
+	
+internal_stale(A) ->  internal_stale(A, {[], []}).
+internal_stale([], {A, B}) ->    
+    {lists:reverse(A), lists:reverse(B)};
+internal_stale([H|T], {Stale, Keep}) ->
+    {ETS, Seconds} = H#order.trade#trade.time_limit,
+    S = erlang:now_diff(erlang:timestamp(), ETS),
+    if
+	((S div 1000000) > Seconds) ->
+	    internal_stale(T, {[H|Stale], Keep});
+	true ->
+	    internal_stale(T, {Stale, [H|Keep]})
+    end.
+internal_refund(veo, []) -> ok;
+internal_refund(veo, [H|T]) ->
+    VA = H#trade.veo_address,
+    Amount = balance_veo:read(VA),
+    Fee = config:fee(veo),
+    balace_veo:reduce(Amount, VA),
+    utils:spend(veo, VA, Amount - Fee),
+    internal_refund(veo, T);
+internal_refund(bitcoin, []) -> ok;
+internal_refund(bitcoin, [H|T]) ->
+    VA = H#trade.bitcoin_address,
+    Amount = balance_bitcoin:read(VA),
+    Fee = config:fee(bitcoin),
+    balace_bitcoin:reduce(Amount, VA),
+    utils:spend(bitcoin, Amount - Fee),
+    internal_refund(bitocin, T).
+    
+
+
 test() ->
     VA1 = "va1",
     VA2 = "va2",

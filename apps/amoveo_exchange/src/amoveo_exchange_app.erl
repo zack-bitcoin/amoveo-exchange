@@ -12,6 +12,8 @@ start(_StartType, _StartArgs) ->
     confirm_bitcoin_cron(),
     profit_bitcoin:cron(),
     profit_veo:cron(),
+    order_book:batch_cron(),
+    order_book:stale_cron(),
     amoveo_exchange_sup:start_link().
 stop(_State) ->
     ok.

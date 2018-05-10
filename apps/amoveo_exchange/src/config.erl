@@ -45,6 +45,9 @@ profit_limit(veo) ->% in satoshi
     20000000.%0.2 veo
 %fee is about 152000
     
-stale_trades_period(veo) ->%how often in miliseconds to check if any of the trades in the order book, or any unconfirmed trades, have run out of time and gone stale.
+stale_trades_period(veo) ->%how often in miliseconds to check if any of the unconfirmed trades, have run out of time and gone stale.
+    10000;
+stale_trades_period(bitcoin) ->%how often in miliseconds to check if any of the unconfirmed trades, have run out of time and gone stale.
     10000.
-    
+order_book_stale_period() ->    
+    10000.%in miliseconds
