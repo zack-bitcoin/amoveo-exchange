@@ -23,6 +23,10 @@ doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmou
     true = is_integer(BitcoinAmount),
     true = is_integer(VeoAmount),
     ok = trade_limit:doit(IP),
+    true = is_integer(TimeLimit),
+    %time limit is a number of seconds for how long to wait until the trade goes stale.
+    true = TimeLimit > config:min_trade_time(),
+    true = TimeLimit < config:max_trade_time(),
     {Type, NA} = case N of
 	       2 -> {unconfirmed_buy_veo, 0};
 	       1 -> {unconfirmed_sell_veo, 

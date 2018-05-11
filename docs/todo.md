@@ -1,8 +1,5 @@
 ======= Erlang
 
-- There should probably be a 12 hour max we store the trade on the server until we give a refund. it is a config.erl variable.
-- we also need a minimum time period that is much longer than how long it takes for transactions to confirm. We can reduce this time period once trades refuse to go stale while unconfirmed txs exist.
-
 
 * keep a record every time veo_balance or bitcoin_balance have income. Keep a record every time we pay a customer. These records can be used to know who owns which money if something goes wrong.
 

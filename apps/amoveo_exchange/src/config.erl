@@ -51,3 +51,7 @@ stale_trades_period(bitcoin) ->%how often in miliseconds to check if any of the 
     10000.
 order_book_stale_period() ->    
     10000.%in miliseconds
+min_trade_time() ->
+    60*60.%in seconds
+max_trade_time() ->
+    12*60*60.%in seconds
