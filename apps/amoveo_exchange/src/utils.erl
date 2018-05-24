@@ -17,9 +17,16 @@ init(Default, LOC) ->
 	     true -> X
 	 end,
     {ok, Ka}.
-    
-
+   
+electrum() -> 
+    "/Applications/Electrum.app/Contents/MacOS/Electrum".
 bitcoin(Command) ->
+    Electrum = "http://localhost:8666",
+    %Example = <<"{ \"id\": 17, \"method\": \"blockchain.estimatefee\", \"params\": [ 6 ] }">>,
+    {ok, {{_, 200, _}, _, R} = httpc:request(post, {Electrum, [], "application/octet-stream", Command}, [{timeout, 3000}], []),
+     R.
+    
+bitcoin_old(Command) ->
     C = "bitcoin-cli " ++ Command ++ " > temp",
     os:cmd(C),
     timer:sleep(200),
@@ -28,16 +35,18 @@ bitcoin(Command) ->
     io:fwrite(F),
     io:fwrite("\n"),
     F.
-new_address(bitcoin) ->
-    X = bitcoin("getnewaddress"),
-    lists:reverse(tl(lists:reverse(binary_to_list(X)))).
+new_address(bitcoin) ->%working here.
+    X = bitcoin("getunusedaddress").
+
+%lists:reverse(tl(lists:reverse(binary_to_list(X)))).
 
 %getreceivedbyaddress "address" ( minconf )
 
 %listreceivedbyaddress ( minconf ) include_empty
 %listreceivedbyaddress 0 true %lists all addresses
-address_received(bitcoin, Address, Confirmations) ->
-    X = bitcoin("getreceivedbyaddress \"" ++ Address ++ "\" " ++ integer_to_list(Confirmations)),
+address_received(bitcoin, Address) ->
+    C = <<<<"{ \"id\": 1, \"method\":\"blockchain.address.get_balance\", \"params\":[">>/binary, Address/binary, <<"] }">>/binary>>,
+    X = bitcoin(C),
     jiffy:decode(X). % returns an integer
 block_txs(N) ->
     {ok, B} = talker:talk({block, 1, N}),
@@ -50,22 +59,26 @@ height(bitcoin) ->
     X = bitcoin("getblockcount"),
    %<<"519291\n">>
     jiffy:decode(X);
-height(veo) -> %move this func to a different module
+height(veo) -> 
     {ok, X} = talker:talk({height, 1}),
     max(0, X - config:confirmations()).
 
 spend_from(veo, Tx) -> element(2, Tx).
 spend_to(veo, Tx) -> element(5, Tx).
 spend_amount(veo, Tx) -> element(6, Tx).
+log(Name, Data) ->
+    file:write_file(Name, Data, [append]).
  
 spend(Type, To, Amount) -> 
     spawn(fun() -> spend2(Type, To, Amount) end).
 spend2(veo, To, Amount) -> 
-    Msg = {spend, To, Amount},
-    talker:talk_helper(Msg);
+    S = "veo, " ++ To ++", " ++ integer_to_list(Amount) ++"\n",
+    log("veo_payments.db", S),
+    ok;
 spend2(bitcoin, To, Amount) ->
-    X = bitcoin("sendtoaddress " ++ To ++ " " ++ integer_to_list(Amount)),
-    jiffy:decode(X).
+    S = "btc, " ++ To ++", " ++ integer_to_list(Amount) ++"\n",
+    log("btc_payments.db", S),
+    ok.
     
 
 bitcoin_test() ->
