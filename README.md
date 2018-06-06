@@ -10,12 +10,8 @@ This is an exchange written for trades between bitcoin and amoveo.
 
 [turn it on](docs/boot_up.md)
 
-The order book matches trades in single-price batches.
-It selects a price to match as many trades as possible.
+The exchange only touches VEO. You send bitcoin to the person you are trading with, and the exchange watches the trade happen on the bitcoin blockchain.
 
-It is a shapeshift style exchange. There are no accounts or passwords.
-You give the details of the trade you want to make, and we provide an address to send your coins to, and a Trade-ID so you can look up the status of your trade.
-Each trade has a customizable time limit. If your trade doesn't get matched or only gets partially matched by the time limit, then we refund your remaining balance.
 
 [what needs to get done](docs/todo.md)
 

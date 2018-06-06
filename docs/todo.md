@@ -1,55 +1,33 @@
 ======= Erlang
 
+A gen_server to keep track of how much veo is controlled by each account.
+* veo balance
+* veo locked in trades
 
-* switch to using cold storage for holding exchange funds.
-- balance_bitcoin needs to be rewritten.
-- utils spend needs to be tested.
-- utils address_received(bitcoin,) needs to be tested
-- and utils:new_address(bitcoin). use a masterpubkey.
-- and utils:bitcoin(_) (piping the output to temp is not working."s
-- and utils:height(bitcoin) and rethink the bitcoin_height module. maybe we can only get the height when we lookup unspent txs.
+* sending veo to the server puts that veo into an account controlled by your private key.
+- cron process keeps checking for the history of the full nodes address.
 
-- don't spend veo or bitcoin. instead make a list of everyone we need to pay.
+A JS page to display your veo balance on the server.
+A JS page to withdrawal your veo from the exchange.
 
-* keep a record every time veo_balance or bitcoin_balance have income. Keep a record every time we pay a customer. These records can be used to know who owns which money if something goes wrong.
+A gen_server keeping track of trades
+* address giving veo
+* address that will receive bitcoin
+* address that will receive veo
+* start block height
+* expiration block height
 
-run tests for unconfirmed_bitcoin and balance_bitcoin
+A JS page for looking up trades
 
-test to make sure utils:spend/3 is working.
-test that order_book pays out the purchased currency.
-test to make sure that profit_veo and profit_bitcoin are correctly sending the profit to cold storage.
-
-* run lots of checks on input to api to make sure it is impossible to crash the order_book.erl gen_server. which could cause loss of customer funds.
-
-* detailed instructions on how to use this tools for trading.
-
-* adjust the shell files for electrum to work with linux.
-
-use the api commands:
-* make a trade
-* look up a trade's status by ID.
-* display a chart of open trades in the market. maybe a graph too.
-
+a gen_server for keeping record of a bitcoin address's balance, to see if it received the payment yet.
 
 
 ======= Future plans that we don't need for version 1.
 
-* it would be nice if users could cancel their trades. Maybe they should send a signed message, or maybe they should send a payment of exactly 1 satoshi.
-- maybe the light node should have a feature to sign messages?
-
-* a command to update the backups without shutting off.
-
-* look up what the current trading fees are
-- api
-- javascript
-
-
-* What if there are unconfirmed payments at the same time a trade goes stale? We should probably let the trade exist longer until there are no unconfirmed payments, then pay the refund.
-
-* consider the case where someone pays us more veo/bitcoin than the trade had said. We should give them a refund of the excess money they sent to us.
-
 
 ======= Legal plan
+
+only touch VEO.
 
 Block IP’s from New York, Washington, Iran, or North Korea.  Reference restricted jurisdictions in terms of service.
 
