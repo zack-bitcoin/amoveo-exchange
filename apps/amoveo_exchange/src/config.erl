@@ -1,10 +1,8 @@
 -module(config).
 -compile(export_all).
 
-mode() -> test.
-%mode() -> production.
-cold(bitcoin) -> %this is the bitcoin address where we send our bitcoin profit.
-    <<"1C5Qq5i4uUyEm84GAZ3iAUFgbVAhbCirwj">>;
+%mode() -> test.
+mode() -> production.
 cold(veo) -> %this is the veo address where we send our veo profit.
     <<"BGH+3P768A9cSNR3GLSRXgsokSL/Jdbm+rOJogbgiPxq8M+J2R4nVxZ+Hj6WdI4rMsq6nPzkMh77WGBCMx89HUM=">>.
 message_frequency() -> 1.%this is how often each ip address can check the status of a trade.
@@ -14,14 +12,12 @@ confirmations() -> %this is how many confirmations we wait after a tx is include
     TM = mode(),
     case TM of
 	test -> 2;
-	_ -> 30
+	_ -> 6
     end.
-fee(veo) -> 7000000;%in satoshis
-fee(bitcoin) -> 70000.%in satoshis
+fee(veo) -> 7000000.%in satoshis
 make_id() -> crypto:strong_rand_bytes(32).
 sync_block_period(veo) -> 40000.%in miliseconds.
-confirm_tx_period(veo) -> 40000;%in miliseconds.
-confirm_tx_period(bitcoin) -> 40000.%in miliseconds.
+confirm_tx_period(veo) -> 40000.%in miliseconds.
 bitcoin_height_check_delay() -> 20.%seconds
 batch_period() -> 1800.%in seconds
 scan_history() -> 100.%when turning on the node with empty databases, how far back in the past do you include transactions from?
@@ -34,13 +30,8 @@ full_node() ->
 id_lookup_file() -> "id_lookup.db".
 file(X) -> atom_to_list(X) ++ ".db".
 trade_time_limit() -> 12 * 60 * 60.%12 hours in seconds
-profit_check_period(bitcoin) ->
-    5000;%every 5 seconds
 profit_check_period(veo) ->
     5000.
-profit_limit(bitcoin) ->%in satoshis
-    1000000;%10 milibits
-%bitcoin fee size is about 16000
 profit_limit(veo) ->% in satoshi
     20000000.%0.2 veo
 %fee is about 152000
@@ -55,3 +46,6 @@ min_trade_time() ->
     60*60.%in seconds
 max_trade_time() ->
     12*60*60.%in seconds
+
+%from(Tx) -> element(2, Tx).
+%amount(Tx) -> element(6, Tx).

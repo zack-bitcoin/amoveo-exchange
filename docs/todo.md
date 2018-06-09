@@ -1,14 +1,14 @@
 ======= Erlang
 
+accounts.erl needs a withdrawal function.
+
 A gen_server to keep track of how much veo is controlled by each account.
-* veo balance
 * veo locked in trades
 
-* sending veo to the server puts that veo into an account controlled by your private key.
-- cron process keeps checking for the history of the full nodes address.
 
 A JS page to display your veo balance on the server.
 A JS page to withdrawal your veo from the exchange.
+
 
 A gen_server keeping track of trades
 * address giving veo
@@ -16,6 +16,7 @@ A gen_server keeping track of trades
 * address that will receive veo
 * start block height
 * expiration block height
+A JS page for initiating a trade
 
 A JS page for looking up trades
 

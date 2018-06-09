@@ -43,15 +43,13 @@ doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmou
 		    NA
 	   end,
     {ok, [Addr, TID]};
-doit({exist, TID}, IP) -> %check the status of your order
-    ok = message_limit:doit(IP),
-    {ok, id_lookup:read(TID)};
-doit({market_data}, IP) ->
-    %This is for displaying all the open orders in the order book. Useful for drawing a volume depth chart.
-    ok = market_data_limit:doit(IP),%we should probably have more restriction on this than the other stuff, since it is so big.
-    {ok, order_book:check()};
+doit({exist, TID}, IP) -> %check the status of a trade
+    {ok, 0};
 doit({test}, _) ->
     {ok, <<"success 2">>};
+doit({account, X}, _) ->
+    {ok, Account} = accounts:get(X),
+    {ok, Account};
 doit(X, _) ->
     io:fwrite("http handler cannot handle this "),
     io:fwrite(packer:pack(X)),

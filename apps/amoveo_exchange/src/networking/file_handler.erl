@@ -16,6 +16,7 @@ handle(Req, _) ->
                <<"/status.js">> -> true;
                <<"/trade.js">> -> true;
                <<"/rpc.js">> -> true;
+               <<"/lookup_account.js">> -> true;
                <<"/main.html">> -> true;
                X -> 
                    io:fwrite("file handler block access to: "),

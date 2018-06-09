@@ -22,7 +22,8 @@ bitcoin(Command) ->
     Electrum = "http://localhost:8666",
     {ok, {{_, 200, _}, _, R}} = httpc:request(post, {Electrum, [], "application/octet-stream", Command}, [{timeout, 3000}], []),
      R.
-    
+   
+ 
 block_txs(N) ->
     {ok, B} = talker:talk({block, 1, N}),
     B.
