@@ -46,6 +46,8 @@ spend(Type, To, Amount) ->
 spend2(veo, To, Amount) -> 
     S = "veo, " ++ To ++", " ++ integer_to_list(Amount) ++"\n",
     log("veo_payments.db", S),
+    Msg = {spend, To, Amount},
+    talker:talk_helper(Msg, config:full_node(), 10)
     ok.
     
 
