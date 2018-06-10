@@ -3,8 +3,8 @@
 
 mode() -> test.
 %mode() -> production.
-cold(veo) -> %this is the veo address where we send our veo profit.
-    <<"BGH+3P768A9cSNR3GLSRXgsokSL/Jdbm+rOJogbgiPxq8M+J2R4nVxZ+Hj6WdI4rMsq6nPzkMh77WGBCMx89HUM=">>.
+%cold(veo) -> %this is the veo address where we send our veo profit.
+%    <<"BGH+3P768A9cSNR3GLSRXgsokSL/Jdbm+rOJogbgiPxq8M+J2R4nVxZ+Hj6WdI4rMsq6nPzkMh77WGBCMx89HUM=">>.
 message_frequency() -> 1.%this is how often each ip address can check the status of a trade.
 trade_frequency() -> 0.2.%this is how often each ip address can put trades into the order book.
 market_data_frequency() -> 3.%this is how often each ip address can look up the open orders from the order book.
