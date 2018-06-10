@@ -21,9 +21,20 @@ function lookup_account1() {
         variable_public_get(["account", x], lookup_account_helper2);
     }
     function lookup_account_helper2(x) {
-	console.log(x);
+	if (x == 0) {
+	    lookup_account.innerHTML = "no account";
+	} else {
+	    console.log(x);
+	    var bal = x[1];
+	    var locked = x[2];
+	    var trades = x[3];
+	    var bal = x[1];
+	    var locked = x[2];
+	    var trades = x[3].slice(1);
+	    var s = "balance = ".concat(bal.toString()).concat(", locked veo = ".concat(locked.toString()).concat(", trade ids ").concat(JSON.stringify(trades)));
+	    lookup_account.innerHTML = s;
+	}
 	//veo, locked veo, request ids
-        //lookup_account.innerHTML = "";
     }
 
 }

@@ -1,8 +1,8 @@
 -module(config).
 -compile(export_all).
 
-%mode() -> test.
-mode() -> production.
+mode() -> test.
+%mode() -> production.
 cold(veo) -> %this is the veo address where we send our veo profit.
     <<"BGH+3P768A9cSNR3GLSRXgsokSL/Jdbm+rOJogbgiPxq8M+J2R4nVxZ+Hj6WdI4rMsq6nPzkMh77WGBCMx89HUM=">>.
 message_frequency() -> 1.%this is how often each ip address can check the status of a trade.
@@ -46,6 +46,7 @@ min_trade_time() ->
     60*60.%in seconds
 max_trade_time() ->
     12*60*60.%in seconds
-
+deposit_fee() ->
+    70000.
 %from(Tx) -> element(2, Tx).
 %amount(Tx) -> element(6, Tx).

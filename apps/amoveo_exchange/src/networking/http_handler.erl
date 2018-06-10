@@ -43,13 +43,33 @@ doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmou
 		    NA
 	   end,
     {ok, [Addr, TID]};
-doit({exist, TID}, IP) -> %check the status of a trade
+doit({exist, _TID}, _) -> %check the status of a trade
     {ok, 0};
 doit({test}, _) ->
     {ok, <<"success 2">>};
 doit({account, X}, _) ->
-    {ok, Account} = accounts:get(X),
-    {ok, Account};
+    case accounts:get(X) of
+	{ok, A} -> {ok, A};
+	error -> {ok, 0}
+    end;
+doit({height}, _) ->
+    {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
+    {ok, NodeHeight};
+doit({pubkey}, _) ->
+    {ok, NodePub} = packer:unpack(talker:talk_helper({pubkey}, config:full_node(), 10)),
+    {ok, NodePub};
+doit({spend, SR}, _) ->
+    spawn(fun() ->
+		  R = element(2, SR),
+		  {28, Pubkey, Height} = R,
+		  {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
+		  true = NodeHeight < Height + 3,
+		  true = NodeHeight > Height - 1,
+		  Sig = element(3, SR),
+		  true = sign:verify_sig(R, Sig, Pubkey),
+		  accounts:withdrawal(Pubkey)
+	  end),
+    {ok, 0};
 doit(X, _) ->
     io:fwrite("http handler cannot handle this "),
     io:fwrite(packer:pack(X)),

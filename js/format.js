@@ -9,7 +9,7 @@ function button_maker(val, fun, div) {
 }
 function input_text_maker(instructions, div){
     var veo_amount = document.createElement("input");
-    var veo_amount.type = "text";
+    veo_amount.type = "text";
     div.append(veo_amount);
     var veo_amount_info = document.createElement("h8");
     veo_amount_info.innerHTML = instructions;
