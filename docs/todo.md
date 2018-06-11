@@ -1,18 +1,11 @@
 ======= Erlang
 
 test withdrawal from accounts.
-test utils:total_received_bitcoin.
 
+trades:update needs to be written.
 
 api for initiating a trade
 
-A gen_server keeping track of trades
-* address giving veo
-* address that will receive bitcoin
-* address that will receive veo
-* start block height
-* expiration block height
-* initial bitcoin balance
 A JS page for initiating a trade
 
 A JS page for looking up trades

@@ -18,10 +18,10 @@ init(Default, LOC) ->
 	 end,
     {ok, Ka}.
    
-bitcoin(Command) ->
-    Electrum = "http://localhost:8666",
-    {ok, {{_, 200, _}, _, R}} = httpc:request(post, {Electrum, [], "application/octet-stream", Command}, [{timeout, 3000}], []),
-     R.
+%bitcoin(Command) ->
+%    Electrum = "http://localhost:8666",
+%    {ok, {{_, 200, _}, _, R}} = httpc:request(post, {Electrum, [], "application/octet-stream", Command}, [{timeout, 3000}], []),
+%     R.
    
  
 block_txs(N) ->
@@ -51,21 +51,9 @@ spend2(veo, To, Amount) ->
     ok.
    
 total_received_bitcoin(Address) -> 
-    S = "https://blockchain.info/balance?active=",
-    S2 = S++Address,
+    S = "https://blockchain.info/q/getreceivedbyaddress/",
+    S2 = S++Address++"?confirmations=6",
     {ok, {_, _, Result}} = httpc:request(S2),
-    Amount = get_amount(list_to_binary(Result)),
-    Amount.
-get_amount(<<"\"total_received\": ", B/binary>>) ->
-    list_to_integer(get_amount2(B));
-get_amount(<<_, R/binary>>) ->
-    get_amount(R).
-
-get_amount2(<<"\n", _/binary>>) ->
-    [];
-get_amount2(<<A, B/binary>>) ->
-    [A|get_amount2(B)].
- 
-%balance   https://blockchain.info/balance?active=$address
+    list_to_integer(Result).
 
 
