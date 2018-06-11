@@ -4,6 +4,8 @@
 	cron/0,get/1,withdrawal/1,lock/3]).
 -record(d, {height, accounts}).
 -record(acc, {veo = 0, locked = 0, rids = [], nonce = 0}).
+empty_account() -> #acc{}.
+    
 -define(LOC, "accounts.db").
 init(ok) -> 
     process_flag(trap_exit, true),
@@ -47,6 +49,26 @@ handle_cast(update, X) ->
 	true -> X
     end,
     {noreply, X2};
+handle_cast({unlock, Pubkey, Amount}, X) ->
+    Accs = X#d.accounts,
+    Account4 = dict:fetch(Pubkey, Accs),
+    Account5 = Account4#acc{locked = Account4#acc.locked - Amount, veo = Account4#acc.veo + Amount},
+    Accs2 = dict:write(Pubkey, Account5, Accs),
+    X2 = X#d{accounts = Accs2},
+    {noreply, X2};
+handle_cast({transfer_locked, From, To, Amount}, X) -> 
+    Accs = X#d.accounts,
+    Account2 = case dict:find(To, Accounts) of
+		   error -> #acc{};
+		   {ok, A} -> A
+	       end,
+    Account3 = Account2#acc{veo = Account2#acc.veo + Amount},
+    Account4 = dict:fetch(From, Accs),
+    Account5 = Account4#acc{locked = Account4#acc.locked - Amount},
+    Accs2 = dict:write(To, Account3, Accs),
+    Accs3 = dict:write(From, Account5, Accs2),
+    X2 = X#d{accounts = Accs3},
+    {noreply, X2};
 handle_cast(_, X) -> {noreply, X}.
 handle_call({lock, Pub, Amount, StartHeight}, _, X) ->
     Accs = X#d.accounts,
@@ -79,6 +101,10 @@ withdrawal(Pub) -> gen_server:cast(?MODULE, {withdrawal, Pub}).
 lock(Pub, Amount, StartHeight) -> gen_server:cast(?MODULE, {lock, Pub, Amount, StartHeight}).
 update() -> gen_server:cast(?MODULE, update).
 get(Pub) -> gen_server:call(?MODULE, {get, Pub}).
+transfer_locked(From, To, Amount) ->
+    gen_server:cast(?MODULE, {transfer_locked, From, To, Amount}).
+unlock(Pubkey, Amount) ->
+    gen_server:cast(?MODULE, {unlock, Pubkey, Amount}).
     
 receive_payments([], X, _) -> X;
 receive_payments([{_, Tx}|T], X, Pubkey) ->

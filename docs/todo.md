@@ -1,14 +1,18 @@
 ======= Erlang
 
+a button for shutting off, and properly saving trade and account info.
+
 test withdrawal from accounts.
-
-trades:update needs to be written.
-
-api for initiating a trade
 
 A JS page for initiating a trade
 
+Api for looking up a trade
+
 A JS page for looking up trades
+
+test the entire process.
+
+Write a legal page similar to shapeshift.
 
 
 

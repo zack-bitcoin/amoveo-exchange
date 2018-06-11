@@ -8,14 +8,14 @@ mode() -> test.
 message_frequency() -> 1.%this is how often each ip address can check the status of a trade.
 trade_frequency() -> 0.2.%this is how often each ip address can put trades into the order book.
 market_data_frequency() -> 3.%this is how often each ip address can look up the open orders from the order book.
-confirmations() -> %this is how many confirmations we wait after a tx is included in a block until we accept the payment as spent.
+confirmations(veo) -> %this is how many confirmations we wait after a tx is included in a block until we accept the payment as spent.
     TM = mode(),
     case TM of
-	test -> 2;
-	_ -> 6
-    end.
+	test -> 1;
+	_ -> 4
+    end;
+confirmations(bitcoin) -> 3.
 fee(veo) -> 7000000.%in satoshis
-make_id() -> crypto:strong_rand_bytes(32).
 sync_block_period(veo) -> 40000.%in miliseconds.
 confirm_tx_period(veo) -> 40000.%in miliseconds.
 bitcoin_height_check_delay() -> 20.%seconds

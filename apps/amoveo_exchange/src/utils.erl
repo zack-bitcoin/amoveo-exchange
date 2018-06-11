@@ -52,7 +52,7 @@ spend2(veo, To, Amount) ->
    
 total_received_bitcoin(Address) -> 
     S = "https://blockchain.info/q/getreceivedbyaddress/",
-    S2 = S++Address++"?confirmations=6",
+    S2 = S++Address++"?confirmations="++(integer_to_list(config:confirmations(bitcoin))),
     {ok, {_, _, Result}} = httpc:request(S2),
     list_to_integer(Result).
 
