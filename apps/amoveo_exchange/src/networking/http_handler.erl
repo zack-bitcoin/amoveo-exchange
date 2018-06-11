@@ -15,34 +15,30 @@ handle(Req, State) ->
     {<<"Access-Control-Allow-Origin">>, <<"*">>}],
     {ok, Req4} = cowboy_req:reply(200, Headers, D, Req3),
     {ok, Req4, State}.
-
-doit({bet, N, CustomerVeoAddress, CustomerBitcoinAddress, VeoAmount, BitcoinAmount, TimeLimit}, IP) -> %sell or buy veo.
-    %add it to the gen_server that waits for enough confirmations.
-    true = 0 < BitcoinAmount,
-    true = 0 < VeoAmount,
-    true = is_integer(BitcoinAmount),
-    true = is_integer(VeoAmount),
+doit({trade, SR}, IP) ->
     ok = trade_limit:doit(IP),
+    R = element(2, SR),
+    {29, Pubkey, Height, BitcoinAddress, VeoTo, TimeLimit, VeoAmount, BitcoinAmount, ServerPubkey} = R,
+    ServerPubkey = config:pubkey(),
+    true = is_integer(VeoAmount),
+    true = VeoAmount > 0,
+    true = is_integer(BitcoinAmount),
+    true = BitcoinAmount > 0,
+    true = is_integer(Height),
     true = is_integer(TimeLimit),
-    %time limit is a number of seconds for how long to wait until the trade goes stale.
     true = TimeLimit > config:min_trade_time(),
     true = TimeLimit < config:max_trade_time(),
-    {Type, NA} = case N of
-	       2 -> {unconfirmed_buy_veo, 0};
-	       1 -> {unconfirmed_sell_veo, 
-		     utils:new_address(bitcoin)}
-	   end,
-    TID = config:make_id(),
-    TimeLimit2 = {erlang:timestamp(), TimeLimit},
-    Trade = #trade{type = Type, veo_address = CustomerVeoAddress, bitcoin_address = CustomerBitcoinAddress, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, time_limit = TimeLimit2, id = TID, server_bitcoin_address = NA},
-    Addr = case N of
-	       2 -> unconfirmed_veo_feeder:trade(Trade),
-		    ServerVeoAddress = utils:pubkey(),
-		    ServerVeoAddress;
-	       1 -> unconfirmed_bitcoin_feeder:trade(Trade),
-		    NA
-	   end,
-    {ok, [Addr, TID]};
+    {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
+    true = NodeHeight < Height + 3,
+    true = NodeHeight > Height - 1,
+    Sig = element(3, SR),
+    true = sign:verify_sig(R, Sig, Pubkey),
+    case accounts:lock(Pubkey, VeoAmount, Height) of
+	success -> 
+	    TradeID = trades:add({Pubkey, Height, BitcoinAddress, VeoTo, TimeLimit, VeoAmount, BitcoinAmount}),
+	    {ok, TradeID};
+	Reason -> {ok, Reason}
+    end;
 doit({exist, _TID}, _) -> %check the status of a trade
     {ok, 0};
 doit({test}, _) ->
@@ -59,16 +55,14 @@ doit({pubkey}, _) ->
     {ok, NodePub} = packer:unpack(talker:talk_helper({pubkey}, config:full_node(), 10)),
     {ok, NodePub};
 doit({spend, SR}, _) ->
-    spawn(fun() ->
-		  R = element(2, SR),
-		  {28, Pubkey, Height} = R,
-		  {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
-		  true = NodeHeight < Height + 3,
-		  true = NodeHeight > Height - 1,
-		  Sig = element(3, SR),
-		  true = sign:verify_sig(R, Sig, Pubkey),
-		  accounts:withdrawal(Pubkey)
-	  end),
+    R = element(2, SR),
+    {28, Pubkey, Height} = R,
+    {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
+    true = NodeHeight < Height + 3,
+    true = NodeHeight > Height - 1,
+    Sig = element(3, SR),
+    true = sign:verify_sig(R, Sig, Pubkey),
+    accounts:withdrawal(Pubkey),
     {ok, 0};
 doit(X, _) ->
     io:fwrite("http handler cannot handle this "),

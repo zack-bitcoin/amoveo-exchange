@@ -1,9 +1,9 @@
 -module(accounts).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	cron/0,get/1,withdrawal/1]).
+	cron/0,get/1,withdrawal/1,lock/3]).
 -record(d, {height, accounts}).
--record(acc, {veo = 0, locked = 0, rids = []}).
+-record(acc, {veo = 0, locked = 0, rids = [], nonce = 0}).
 -define(LOC, "accounts.db").
 init(ok) -> 
     process_flag(trap_exit, true),
@@ -48,6 +48,27 @@ handle_cast(update, X) ->
     end,
     {noreply, X2};
 handle_cast(_, X) -> {noreply, X}.
+handle_call({lock, Pub, Amount, StartHeight}, _, X) ->
+    Accs = X#d.accounts,
+    {ok, A} = dict:find(Pub, Accs),
+    {Q, X2} = 
+	case dict:find(Pub, Accs) of
+	    error -> {<<"account does not exist">>, X};
+	    {ok, A} ->
+		if 
+		    StartHeight =< A#acc.nonce ->
+			{<<"no request reuse">>, X};
+		    Amount > A#acc.veo -> {<<"you don't have enough veo to do that">>, X};
+		    true ->
+			A2 = A#acc{nonce = StartHeight,
+				   veo = A#acc.veo - Amount},
+			Acc2 = dict:write(Pub, A2, Accs),
+			X3 = X#d{accounts = Acc2},
+			{success, X3}
+		end
+	end,
+    {reply, Q, X2};
+
 handle_call({get, Pub}, _From, X) -> 
     Accs = X#d.accounts,
     Y = dict:find(Pub, Accs),
@@ -55,6 +76,7 @@ handle_call({get, Pub}, _From, X) ->
 handle_call(_, _From, X) -> {reply, X, X}.
 
 withdrawal(Pub) -> gen_server:cast(?MODULE, {withdrawal, Pub}).
+lock(Pub, Amount, StartHeight) -> gen_server:cast(?MODULE, {lock, Pub, Amount, StartHeight}).
 update() -> gen_server:cast(?MODULE, update).
 get(Pub) -> gen_server:call(?MODULE, {get, Pub}).
     

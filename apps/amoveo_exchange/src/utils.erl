@@ -47,8 +47,25 @@ spend2(veo, To, Amount) ->
     S = "veo, " ++ To ++", " ++ integer_to_list(Amount) ++"\n",
     log("veo_payments.db", S),
     Msg = {spend, To, Amount},
-    talker:talk_helper(Msg, config:full_node(), 10)
+    talker:talk_helper(Msg, config:full_node(), 10),
     ok.
-    
+   
+total_received_bitcoin(Address) -> 
+    S = "https://blockchain.info/balance?active=",
+    S2 = S++Address,
+    {ok, {_, _, Result}} = httpc:request(S2),
+    Amount = get_amount(list_to_binary(Result)),
+    Amount.
+get_amount(<<"\"total_received\": ", B/binary>>) ->
+    list_to_integer(get_amount2(B));
+get_amount(<<_, R/binary>>) ->
+    get_amount(R).
+
+get_amount2(<<"\n", _/binary>>) ->
+    [];
+get_amount2(<<A, B/binary>>) ->
+    [A|get_amount2(B)].
+ 
+%balance   https://blockchain.info/balance?active=$address
 
 

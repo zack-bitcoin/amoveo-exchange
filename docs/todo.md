@@ -1,14 +1,10 @@
 ======= Erlang
 
-accounts.erl needs a withdrawal function.
-
-A gen_server to keep track of how much veo is controlled by each account.
-* veo locked in trades
+test withdrawal from accounts.
+test utils:total_received_bitcoin.
 
 
-A JS page to display your veo balance on the server.
-A JS page to withdrawal your veo from the exchange.
-
+api for initiating a trade
 
 A gen_server keeping track of trades
 * address giving veo
@@ -16,11 +12,11 @@ A gen_server keeping track of trades
 * address that will receive veo
 * start block height
 * expiration block height
+* initial bitcoin balance
 A JS page for initiating a trade
 
 A JS page for looking up trades
 
-a gen_server for keeping record of a bitcoin address's balance, to see if it received the payment yet.
 
 
 ======= Future plans that we don't need for version 1.
