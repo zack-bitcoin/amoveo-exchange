@@ -1,8 +1,8 @@
 -module(config).
 -compile(export_all).
 
-mode() -> test.
-%mode() -> production.
+%mode() -> test.
+mode() -> production.
 message_frequency() -> 1.%this is how often each ip address can check the status of a trade.
 trade_frequency() -> 0.2.%this is how often each ip address can put trades into the order book.
 market_data_frequency() -> 3.%this is how often each ip address can look up the open orders from the order book.
