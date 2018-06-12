@@ -40,9 +40,9 @@ max_trade_time() ->
 deposit_fee() ->
     70000.  %0.0007 veo
 trade_fee() ->
-    10000000. %0.1 veo
+    5000000. %0.05 veo
 trade_fee_refund() ->
-    7000000.  %0.07
+    3000000.  %0.03
 %from(Tx) -> element(2, Tx).
 %amount(Tx) -> element(6, Tx).
 trades_cron_period() ->
