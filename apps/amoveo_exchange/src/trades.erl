@@ -70,6 +70,5 @@ cron() ->
     spawn(fun() -> cron2() end).
 cron2() ->
     timer:sleep(config:trades_cron_period()),
-    io:fwrite("trades cron\n"),
     update(),
     cron2().

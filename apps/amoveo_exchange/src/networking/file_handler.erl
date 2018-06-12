@@ -5,9 +5,9 @@
 %curl -i -d '[-6,"test"]' http://localhost:3011
 handle(Req, _) ->
     {F, _} = cowboy_req:path(Req),
-    io:fwrite("file handler handle\n"),
-    io:fwrite(F),
-    io:fwrite("\n"),
+    %io:fwrite("file handler handle\n"),
+    %io:fwrite(F),
+    %io:fwrite("\n"),
     PrivDir = <<"../../../../js">>,
     true = case F of
                <<"/favicon.ico">> -> true;

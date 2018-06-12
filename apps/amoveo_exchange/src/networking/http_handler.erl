@@ -15,7 +15,7 @@ handle(Req, State) ->
     {<<"Access-Control-Allow-Origin">>, <<"*">>}],
     {ok, Req4} = cowboy_req:reply(200, Headers, D, Req3),
     {ok, Req4, State}.
-doit({trade, SR}, IP) ->
+doit({trade, SR}, _) ->
     io:fwrite("submitting a trade\n"),
     %ok = trade_limit:doit(IP),
     R = element(2, SR),

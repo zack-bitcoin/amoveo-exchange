@@ -50,9 +50,10 @@ handle_cast(update, X) ->
 handle_cast({unlock, Pubkey, Amount, BitcoinAddress}, X) ->
     Accs = X#d.accounts,
     Account4 = dict:fetch(Pubkey, Accs),
+    TradeFailRefund = config:trade_fee_refund(),
     Account5 = Account4#acc{
 		 locked = Account4#acc.locked - Amount, 
-		 veo = Account4#acc.veo + Amount,
+		 veo = Account4#acc.veo + Amount + TradeFailRefund,
 		 rids = remove_from_list(BitcoinAddress, Account4#acc.rids)},
     Accs2 = dict:store(Pubkey, Account5, Accs),
     X2 = X#d{accounts = Accs2},
@@ -79,13 +80,14 @@ handle_call({lock, Pub, Amount, StartHeight, BitcoinAddress}, _, X) ->
 	case dict:find(Pub, Accs) of
 	    error -> {<<"account does not exist">>, X};
 	    {ok, A} ->
+		TradeFee = config:trade_fee(),
 		if 
 		    StartHeight =< A#acc.nonce ->
 			{<<"no request reuse">>, X};
-		    Amount > A#acc.veo -> {<<"you don't have enough veo to do that">>, X};
+		    (Amount + TradeFee) > A#acc.veo -> {<<"you don't have enough veo to do that">>, X};
 		    true ->
 			A2 = A#acc{nonce = StartHeight,
-				   veo = A#acc.veo - Amount,
+				   veo = A#acc.veo - Amount - TradeFee,
 				   locked = A#acc.locked + Amount,
 				   rids = [BitcoinAddress|A#acc.rids]},
 			Acc2 = dict:store(Pub, A2, Accs),
