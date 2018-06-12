@@ -43,7 +43,9 @@
     function generate_unsigned_request(){
 	variable_public_get(["height"], function(height) {
 	    variable_public_get(["pubkey"], function(server_pubkey) {
-		var request = [-7, 29, pubkey.value, height, btoa(bitcoin_address.value), veo_to.value, parseInt(time_limit.value), parseInt(veo_amount.value), parseInt(bitcoin_amount.value), server_pubkey];
+		var ba2 = Math.floor(parseFloat(bitcoin_amount.value) * 100000000);
+		var va2 = Math.floor(parseFloat(veo_amount.value) * 100000000);
+		var request = [-7, 29, pubkey.value, height, btoa(bitcoin_address.value), veo_to.value, parseInt(time_limit.value), parseInt(veo_amount.value), ba2, server_pubkey];
 		unsigned_div.innerHTML = JSON.stringify(request);
 	    });
 	});

@@ -14,7 +14,6 @@ terminate(_, X) ->
     io:format("trades died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast(update, X) -> 
-    io:fwrite("trades update \n"),
     Keys = dict:fetch_keys(X),
     X2 = update_internal(Keys, X),
     {noreply, X2};
@@ -25,7 +24,7 @@ handle_call({add, {From, StartHeight, BitcoinAddress, VeoTo, TimeLimit, VeoAmoun
 	      error ->
 		  IB0 = utils:total_received_bitcoin(BitcoinAddress),
 		  IB = case config:mode() of
-			   test -> IB0 - 10;
+			   test -> IB0;% - 10;% subtracting 10 is useful to test our ability to read bitcoin txs.
 			   production -> IB0
 		       end,
 		  T = #trade{veo_from = From, start_height = StartHeight, bitcoin_address = BitcoinAddress, veo_to = VeoTo, start_time = erlang:timestamp(), time_limit = TimeLimit, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, initial_bitcoin_balance = IB},
@@ -52,11 +51,6 @@ update_internal([Key|T], Dict) ->
     TL = K#trade.time_limit,
     ST = K#trade.start_time,
     Seconds = timer:now_diff(erlang:timestamp(), ST) div 1000000,
-    io:fwrite("seconds tl \n"),
-    io:fwrite(integer_to_list(Seconds)),
-    io:fwrite(" "),
-    io:fwrite(integer_to_list(TL)),
-    io:fwrite("\n"),
     VF = K#trade.veo_from,
     VA = K#trade.veo_amount,
     Dict2 = if
