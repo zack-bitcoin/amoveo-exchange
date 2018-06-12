@@ -1,11 +1,9 @@
 -module(accounts).
 -behaviour(gen_server).
 -export([start_link/0,code_change/3,handle_call/3,handle_cast/2,handle_info/2,init/1,terminate/2,
-	cron/0,get/1,withdrawal/1,lock/3]).
+	cron/0,get/1,withdrawal/1,lock/3,transfer_locked/3,unlock/2]).
 -record(d, {height, accounts}).
 -record(acc, {veo = 0, locked = 0, rids = [], nonce = 0}).
-empty_account() -> #acc{}.
-    
 -define(LOC, "accounts.db").
 init(ok) -> 
     process_flag(trap_exit, true),
@@ -29,7 +27,7 @@ handle_cast({withdrawal, Pubkey}, X) ->
 		 Amount = Acc#acc.veo,
 		 utils:spend(veo, Pubkey, Amount),
 		 Acc2 = Acc#acc{veo = 0},
-		 A2 = dict:write(Pubkey, Acc2, A),
+		 A2 = dict:store(Pubkey, Acc2, A),
 		 X#d{accounts = A2}
 	 end,
     {noreply, X2};
@@ -53,20 +51,20 @@ handle_cast({unlock, Pubkey, Amount}, X) ->
     Accs = X#d.accounts,
     Account4 = dict:fetch(Pubkey, Accs),
     Account5 = Account4#acc{locked = Account4#acc.locked - Amount, veo = Account4#acc.veo + Amount},
-    Accs2 = dict:write(Pubkey, Account5, Accs),
+    Accs2 = dict:store(Pubkey, Account5, Accs),
     X2 = X#d{accounts = Accs2},
     {noreply, X2};
 handle_cast({transfer_locked, From, To, Amount}, X) -> 
     Accs = X#d.accounts,
-    Account2 = case dict:find(To, Accounts) of
+    Account2 = case dict:find(To, Accs) of
 		   error -> #acc{};
 		   {ok, A} -> A
 	       end,
     Account3 = Account2#acc{veo = Account2#acc.veo + Amount},
     Account4 = dict:fetch(From, Accs),
     Account5 = Account4#acc{locked = Account4#acc.locked - Amount},
-    Accs2 = dict:write(To, Account3, Accs),
-    Accs3 = dict:write(From, Account5, Accs2),
+    Accs2 = dict:store(To, Account3, Accs),
+    Accs3 = dict:store(From, Account5, Accs2),
     X2 = X#d{accounts = Accs3},
     {noreply, X2};
 handle_cast(_, X) -> {noreply, X}.
@@ -84,7 +82,7 @@ handle_call({lock, Pub, Amount, StartHeight}, _, X) ->
 		    true ->
 			A2 = A#acc{nonce = StartHeight,
 				   veo = A#acc.veo - Amount},
-			Acc2 = dict:write(Pub, A2, Accs),
+			Acc2 = dict:store(Pub, A2, Accs),
 			X3 = X#d{accounts = Acc2},
 			{success, X3}
 		end

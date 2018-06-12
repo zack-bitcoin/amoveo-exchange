@@ -28,6 +28,12 @@ doit({trade, SR}, IP) ->
     true = is_integer(TimeLimit),
     true = TimeLimit > config:min_trade_time(),
     true = TimeLimit < config:max_trade_time(),
+    true = is_binary(BitcoinAddress),
+    true = is_binary(VeoTo),
+    true = is_binary(Pubkey),
+    34 = size(BitcoinAddress),
+    65 = size(VeoTo),
+    65 = size(Pubkey),
     {ok, NodeHeight} = packer:unpack(talker:talk_helper({height}, config:full_node(), 10)),
     true = NodeHeight < Height + 3,
     true = NodeHeight > Height - 1,
@@ -35,12 +41,16 @@ doit({trade, SR}, IP) ->
     true = sign:verify_sig(R, Sig, Pubkey),
     case accounts:lock(Pubkey, VeoAmount, Height) of
 	success -> 
-	    TradeID = trades:add({Pubkey, Height, BitcoinAddress, VeoTo, TimeLimit, VeoAmount, BitcoinAmount}),
-	    {ok, TradeID};
+	    Result = trades:add({Pubkey, Height, BitcoinAddress, VeoTo, TimeLimit, VeoAmount, BitcoinAmount}),
+	    {ok, Result};
 	Reason -> {ok, Reason}
     end;
-doit({exist, _TID}, _) -> %check the status of a trade
-    {ok, 0};
+doit({exist, BitcoinAddress}, _) -> %check the status of a trade
+    R = case trades:read(BitcoinAddress) of
+	    error -> <<"does not exist">>;
+	    {ok, X} -> X
+	end,
+    {ok, R};
 doit({test}, _) ->
     {ok, <<"success 2">>};
 doit({account, X}, _) ->

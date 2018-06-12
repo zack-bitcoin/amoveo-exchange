@@ -33,7 +33,7 @@ pubkey() -> %gets your veo pubkey.
 
 height(veo) -> 
     {ok, X} = talker:talk({height, 1}),
-    max(0, X - config:confirmations()).
+    max(0, X - config:confirmations(veo)).
 
 spend_from(veo, Tx) -> element(2, Tx).
 spend_to(veo, Tx) -> element(5, Tx).
@@ -44,7 +44,7 @@ log(Name, Data) ->
 spend(Type, To, Amount) -> 
     spawn(fun() -> spend2(Type, To, Amount) end).
 spend2(veo, To, Amount) -> 
-    S = "veo, " ++ To ++", " ++ integer_to_list(Amount) ++"\n",
+    S = "veo, " ++ binary_to_list(base64:encode(To)) ++", " ++ integer_to_list(Amount) ++"\n",
     log("veo_payments.db", S),
     Msg = {spend, To, Amount},
     talker:talk_helper(Msg, config:full_node(), 10),
@@ -55,5 +55,10 @@ total_received_bitcoin(Address) ->
     S2 = S++Address++"?confirmations="++(integer_to_list(config:confirmations(bitcoin))),
     {ok, {_, _, Result}} = httpc:request(S2),
     list_to_integer(Result).
+off() ->
+    amoveo_exchange_sup:stop(),
+    ok = application:stop(amoveo_exchange),
+    ok.
+    
 
 

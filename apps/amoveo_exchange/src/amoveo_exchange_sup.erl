@@ -1,12 +1,14 @@
 -module(amoveo_exchange_sup).
 -behaviour(supervisor).
 -export([start_link/0]).
--export([init/1]).
+-export([init/1, stop/0]).
 -define(SERVER, ?MODULE).
--define(keys, [accounts
-	       %id_lookup, unconfirmed_veo, unconfirmed_bitcoin, order_book, balance_veo, balance_bitcoin, order_book_data, profit_bitcoin, profit_veo,
-	       %market_data_limit, message_limit, trade_limit
-	      ]).
+-define(keys, [accounts, trades, trade_limit, message_limit]).
+child_killer([]) -> [];
+child_killer([H|T]) -> 
+    supervisor:terminate_child(?MODULE, H),
+    child_killer(T).
+stop() -> child_killer(?keys).
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 -define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).

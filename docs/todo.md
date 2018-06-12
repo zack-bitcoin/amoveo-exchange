@@ -1,16 +1,6 @@
 ======= Erlang
 
-a button for shutting off, and properly saving trade and account info.
-
-test withdrawal from accounts.
-
-A JS page for initiating a trade
-
-Api for looking up a trade
-
-A JS page for looking up trades
-
-test the entire process.
+test the trade process.
 
 Write a legal page similar to shapeshift.
 
