@@ -16,10 +16,11 @@ handle(Req, State) ->
     {ok, Req4} = cowboy_req:reply(200, Headers, D, Req3),
     {ok, Req4, State}.
 doit({trade, SR}, IP) ->
-    ok = trade_limit:doit(IP),
+    io:fwrite("submitting a trade\n"),
+    %ok = trade_limit:doit(IP),
     R = element(2, SR),
     {29, Pubkey, Height, BitcoinAddress, VeoTo, TimeLimit, VeoAmount, BitcoinAmount, ServerPubkey} = R,
-    ServerPubkey = config:pubkey(),
+    ServerPubkey = base64:encode(utils:pubkey()),
     true = is_integer(VeoAmount),
     true = VeoAmount > 0,
     true = is_integer(BitcoinAmount),
@@ -39,11 +40,17 @@ doit({trade, SR}, IP) ->
     true = NodeHeight > Height - 1,
     Sig = element(3, SR),
     true = sign:verify_sig(R, Sig, Pubkey),
-    case accounts:lock(Pubkey, VeoAmount, Height) of
+    io:fwrite("submitting a trade 2\n"),
+    case accounts:lock(Pubkey, VeoAmount, Height, BitcoinAddress) of
 	success -> 
+	    io:fwrite("account locked\n"),
 	    Result = trades:add({Pubkey, Height, BitcoinAddress, VeoTo, TimeLimit, VeoAmount, BitcoinAmount}),
 	    {ok, Result};
-	Reason -> {ok, Reason}
+	Reason -> 
+	    io:fwrite("trade failed because \n"),
+	    io:fwrite(Reason),
+	    io:fwrite("\n"),
+	    {ok, Reason}
     end;
 doit({exist, BitcoinAddress}, _) -> %check the status of a trade
     R = case trades:read(BitcoinAddress) of

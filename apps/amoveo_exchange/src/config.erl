@@ -42,11 +42,21 @@ stale_trades_period(bitcoin) ->%how often in miliseconds to check if any of the 
     10000.
 order_book_stale_period() ->    
     10000.%in miliseconds
-min_trade_time() ->
-    60*60.%in seconds
+min_trade_time() ->%in seconds
+    case mode() of
+	test -> 0;
+	production -> 60*60
+    end.
 max_trade_time() ->
     12*60*60.%in seconds
 deposit_fee() ->
     70000.
 %from(Tx) -> element(2, Tx).
 %amount(Tx) -> element(6, Tx).
+trades_cron_period() ->
+    case mode() of
+	test -> 3000;
+	production -> 40000%40 seconds
+    end.
+
+	    

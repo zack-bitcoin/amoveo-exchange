@@ -1,6 +1,7 @@
 (function lookup_trade() {
     document.body.appendChild(document.createElement("br"));
     var div = document.createElement("div");
+    document.body.appendChild(div);
     var button = document.createElement("input");
     button.type = "button";
     button.value = "lookup trade";
@@ -11,7 +12,7 @@
     div.appendChild(trade_div);
     
     function lookup() {
-	variable_public_get(["exist", bitcoin_address.value], function(trade) {
+	variable_public_get(["exist", btoa(bitcoin_address.value)], function(trade) {
 	    trade_div.innerHTML = JSON.stringify(trade);
 	    console.log(trade);
 	});

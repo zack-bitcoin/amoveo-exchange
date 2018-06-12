@@ -1,6 +1,8 @@
 ======= Erlang
 
-test the trade process.
+javascript should measure in bitcoin and veo, not in satoshis.
+
+improve javascript for displaying status of a trade
 
 Write a legal page similar to shapeshift.
 

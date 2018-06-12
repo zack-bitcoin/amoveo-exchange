@@ -43,12 +43,16 @@
     function generate_unsigned_request(){
 	variable_public_get(["height"], function(height) {
 	    variable_public_get(["pubkey"], function(server_pubkey) {
-		var request = [-7, 29, pubkey.value, height, bitcoin_address.value, veo_to.value, time_limit.value, parseInt(veo_amount.value), parseInt(bitcoin_amount.value), server_pubkey];
+		var request = [-7, 29, pubkey.value, height, btoa(bitcoin_address.value), veo_to.value, parseInt(time_limit.value), parseInt(veo_amount.value), parseInt(bitcoin_amount.value), server_pubkey];
 		unsigned_div.innerHTML = JSON.stringify(request);
 	    });
 	});
     };
     function publish_signed_request(){
+	var sr = JSON.parse(signed.value);
+	variable_public_get(["trade", sr], function(x) {
+	    console.log("publish signed request");
+	});
 
     }
 

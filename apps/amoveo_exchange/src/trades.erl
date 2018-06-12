@@ -10,19 +10,24 @@ init(ok) ->
 start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, ok, []).
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
 terminate(_, X) -> 
-    utils:save(?LOC, X),
-    io:format("died!"), ok.
+    utils:save(X, ?LOC),
+    io:format("trades died!"), ok.
 handle_info(_, X) -> {noreply, X}.
 handle_cast(update, X) -> 
+    io:fwrite("trades update \n"),
     Keys = dict:fetch_keys(X),
     X2 = update_internal(Keys, X),
-    {noreply, X};
+    {noreply, X2};
 handle_cast(_, X) -> {noreply, X}.
 handle_call({add, {From, StartHeight, BitcoinAddress, VeoTo, TimeLimit, VeoAmount, BitcoinAmount}}, _, X) ->
     {X3, Result} 
 	= case dict:find(BitcoinAddress, X) of
 	      error ->
-		  IB = utils:total_received_bitcoin(BitcoinAddress),
+		  IB0 = utils:total_received_bitcoin(BitcoinAddress),
+		  IB = case config:mode() of
+			   test -> IB0 - 10;
+			   production -> IB0
+		       end,
 		  T = #trade{veo_from = From, start_height = StartHeight, bitcoin_address = BitcoinAddress, veo_to = VeoTo, start_time = erlang:timestamp(), time_limit = TimeLimit, veo_amount = VeoAmount, bitcoin_amount = BitcoinAmount, initial_bitcoin_balance = IB},
 		  X2 = dict:store(BitcoinAddress, T, X),
 		  {X2, <<"trade with that bitcoin address already exists">>};
@@ -40,22 +45,28 @@ add(X) -> gen_server:call(?MODULE, {add, X}).
 update() -> gen_server:cast(?MODULE, update).
 update_internal([], Dict) -> Dict;
 update_internal([Key|T], Dict) ->
-    K = dict:fetch(Key),
+    K = dict:fetch(Key, Dict),
     GA = K#trade.initial_bitcoin_balance + K#trade.bitcoin_amount,
-    CA = utils:bitcoin_balance(K#trade.bitcoin_address),
+    BA = K#trade.bitcoin_address,
+    CA = utils:total_received_bitcoin(BA),
     TL = K#trade.time_limit,
     ST = K#trade.start_time,
     Seconds = timer:now_diff(erlang:timestamp(), ST) div 1000000,
+    io:fwrite("seconds tl \n"),
+    io:fwrite(integer_to_list(Seconds)),
+    io:fwrite(" "),
+    io:fwrite(integer_to_list(TL)),
+    io:fwrite("\n"),
     VF = K#trade.veo_from,
     VA = K#trade.veo_amount,
     Dict2 = if
 		GA =< CA -> 
 		    %check if any trade has been funded with bitcoin. if it has, then forward those veo to the different account, and delete the trade.
-		    accounts:transfer_locked(VF, K#trade.veo_to, VA),
+		    accounts:transfer_locked(VF, K#trade.veo_to, VA, BA),
 		    dict:erase(Key, Dict);
 		Seconds > TL ->
 		    %check if any trade is expired. if it is, delete it and move the money in that account from locked to veo.
-		    accounts:unlock(VF, VA),
+		    accounts:unlock(VF, VA, BA),
 		    dict:erase(Key, Dict);
 		true -> Dict
 	    end,
@@ -64,6 +75,7 @@ update_internal([Key|T], Dict) ->
 cron() ->
     spawn(fun() -> cron2() end).
 cron2() ->
-    timer:sleep(40000),%every 40 seconds.
+    timer:sleep(config:trades_cron_period()),
+    io:fwrite("trades cron\n"),
     update(),
     cron2().

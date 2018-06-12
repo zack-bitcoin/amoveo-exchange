@@ -5,6 +5,7 @@ start(_StartType, _StartArgs) ->
     inets:start(),
     start_http(),
     accounts:cron(),
+    trades:cron(),
     %veo_sync(),
     %unconfirmed_veo_feeder:confirm_veo_cron(),
     %unconfirmed_veo_feeder:stale_trades_cron(),

@@ -31,10 +31,17 @@ function lookup_account1() {
 	    var bal = x[1];
 	    var locked = x[2];
 	    var trades = x[3].slice(1);
-	    var s = "balance = ".concat(bal.toString()).concat(", locked veo = ".concat(locked.toString()).concat(", trade ids ").concat(JSON.stringify(trades)));
+	    var s = "balance = ".concat(bal.toString()).concat(", locked veo = ".concat(locked.toString()).concat(", trade ids ").concat(JSON.stringify(decode_trades(trades))));
 	    lookup_account.innerHTML = s;
 	}
 	//veo, locked veo, request ids
+    }
+    function decode_trades(l) {
+	var r = [];
+	for (i=0;i<l.length;i++) {
+	    r.push(atob(l[i]))
+	}
+	return r;
     }
 
 }
