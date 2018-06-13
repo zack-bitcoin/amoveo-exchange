@@ -1,5 +1,8 @@
 ======= Erlang
 
+
+put warnings to stop invalid requests from being generated.
+
 Write a legal page similar to shapeshift.
 
 
