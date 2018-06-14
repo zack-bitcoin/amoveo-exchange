@@ -31,9 +31,8 @@ handle_cast({withdrawal, Pubkey}, X) ->
 		 X#d{accounts = A2}
 	 end,
     {noreply, X2};
-handle_cast(update, X) -> 
+handle_cast({update, NewHeight}, X) -> 
     H = X#d.height,
-    NewHeight = utils:height(veo),
     Pubkey = utils:pubkey(),
     X2 = if
 	NewHeight > H ->
@@ -105,7 +104,11 @@ handle_call(_, _From, X) -> {reply, X, X}.
 
 withdrawal(Pub) -> gen_server:cast(?MODULE, {withdrawal, Pub}).
 lock(Pub, Amount, StartHeight, BitcoinAddress) -> gen_server:call(?MODULE, {lock, Pub, Amount, StartHeight, BitcoinAddress}).
-update() -> gen_server:cast(?MODULE, update).
+update() -> 
+    spawn(fun() ->
+		  Height = utils:height(veo),
+		  gen_server:cast(?MODULE, {update, Height})
+	  end).
 get(Pub) -> gen_server:call(?MODULE, {get, Pub}).
 transfer_locked(From, To, Amount, BitcoinAddress) ->
     gen_server:cast(?MODULE, {transfer_locked, From, To, Amount, BitcoinAddress}).
