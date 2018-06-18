@@ -11,9 +11,11 @@ function input_text_maker(instructions, div){
     var veo_amount = document.createElement("input");
     veo_amount.type = "text";
     div.append(veo_amount);
-    var veo_amount_info = document.createElement("h8");
-    veo_amount_info.innerHTML = instructions;
-    div.append(veo_amount_info);
+    if(typeof instructions !== 'object'){
+        var veo_amount_info = document.createElement("h8");
+        veo_amount_info.innerHTML = instructions;
+    }
+    div.append(veo_amount_info||instructions);
     return veo_amount;
 
 }

@@ -1,27 +1,43 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Amoveo Escrow Exchange Tool (BTC/VEO)</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script type="text/javascript" src="format.js" ></script>
+    <script type="text/javascript" src="rpc.js" ></script>
   </head>
   <body>
     <div id="translations"></div>
+    <div class="server" id="server"></div>
+    <script type="text/javascript" src="server.js" ></script>
+    <div id="header">
+      <img src="logo.png" alt="Amoveo" height="150" />
+      <h1>Amoveo Escrow Exchange Tool (BTC/VEO)</h1>
+    </div>
+
+    <div id="buyer">
+      
+    </div>
+
+    <div id="seller" class="seller">
+      <script type="text/javascript" src="step1.js" ></script>
+    </div>
+    
+
+    
+    <h3>lookup account</h3>
+    <script type="text/javascript" src="lookup_account.js" ></script>
+    <h3>withdraw VEO</h3>
+    <script type="text/javascript" src="withdrawal.js" ></script>
+    <h3>make escrow</h3>
+    <script type="text/javascript" src="make_trade.js" ></script>
+
+  <p>warning. Only participate in a trade if there is enough time for your bitcoin tx to get 3 confirmations. We recommend at least 90 minutes = 5400 seconds.</p>
+
+    <h3>look up escrow</h3>
+    <script type="text/javascript" src="lookup_trade.js" ></script>
+
+    <a href="instructions.html">instructions</a>
+    <script type="text/javascript" src="main.js" ></script>
   </body>
-  <a href="instructions.html">instructions</a>
-  <h1>Amoveo Exchange</h1>
-  <script type="text/javascript" src="rpc.js" ></script>
-  <script type="text/javascript" src="server.js" ></script>
-  <script type="text/javascript" src="format.js" ></script>
-
-  <script type="text/javascript" src="server_pub.js" ></script>
-  <h3>lookup account</h3>
-  <script type="text/javascript" src="lookup_account.js" ></script>
-  <p> deposit fee is currently 0.0007 VEO. trade fee is 0.05 VEO. If the bitcoin doesn't arrive withing the time limit, then the trade is refunded, you get 0.03 VEO of the fee back. </p>
-  <h3>withdraw VEO</h3>
-  <script type="text/javascript" src="withdrawal.js" ></script>
-  <h3>make escrow</h3>
-  <script type="text/javascript" src="make_trade.js" ></script>
-
-<p>warning. Only participate in a trade if there is enough time for your bitcoin tx to get 3 confirmations. We recommend at least 90 minutes = 5400 seconds.</p>
-
-  <h3>look up escrow</h3>
-  <script type="text/javascript" src="lookup_trade.js" ></script>
 </html>

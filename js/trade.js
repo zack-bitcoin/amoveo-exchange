@@ -1,4 +1,4 @@
-(funcion(){
+(function(){
     var div = document.createElement("div");
     document.body.appendChild(div);
     var trade_type = input_text_maker("write 'sell' if you are selling veo, write 'buy' if you are buying veo", div):
