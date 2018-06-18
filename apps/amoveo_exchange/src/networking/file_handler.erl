@@ -21,6 +21,7 @@ handle(Req, _) ->
                <<"/make_trade.js">> -> true;
                <<"/withdrawal.js">> -> true;
                <<"/server_pub.js">> -> true;
+               <<"/instructions.html">> -> true;
                <<"/main.html">> -> true;
                X -> 
                    io:fwrite("file handler block access to: "),

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <h1>Amoveo Exchange Instructions</h1>
+
+  <h3> For sellers </h3>
+  <ol>
+  <li>Go to <a href="main.html"> exchange home </a></li>
+  <li>Deposit required VEO to exchange account</li>
+  <li>Wait for 4 confirmations.</li>
+  <li>Fill all required field:
+    <ul>
+    <li> bitcoin address that will receive bitcoins - Your bitcoin address </li>
+  <li> address that will receive VEO - Buyer's VEO address </li>
+  <li> time limit in seconds. If the bitcoin doesn't arrive within this limit, then the veo is refunded - keep it by default </li>
+  <li> how many veo to sell - Amount of VEO you're selling </li>
+    <li> how many bitcoin to buy - Total amount of BTC, that Buyer will send you. </li>
+    </ul>
+  </li>
+  <li> Click on generate unsigned trade request </li>
+  <li> Copy unsigned trade request (whole string) and sign it with light wallet http://159.65.120.84:8080/wallet.html </li>
+  <li> Copy signed request from wallet and paste in into field next to publish signed trade request and click on this button. </li>
+  <li> Give received trade request to buyer. </li>
+  <li> Wait for the payment. </li>
+  </ol>
+
+  <h3> For buyers </h3>
+  <ol>
+    <li>Go to http://159.89.106.253:8087/main.html and get trade request from seller.</li>
+  <li> Put that request into lookup trade field, click on the button and check all details of the deal (very carefully check your VEO address, amount of VEO and BTC) </li>
+  <li> Send required BTC to seller address. </li>
+    <li> Wait for 3 confirmation </li>
+    <li> Withdraw your veo from the exchange
+      <ul>
+	<li> put your pubkey into the "lookup account" spot</li>
+	<li> click "generate unsigned request to withdraw funds"</li>
+	<li> Copy unsigned request (whole string) and sign it with light wallet http://159.65.120.84:8080/wallet.html </li>
+	<li> Copy signed request from wallet and paste in into field next to "publish signed request to withdraw funds" and click on this button. </li>
+      </ul>
+    </li>
+  </ol>
