@@ -44,19 +44,25 @@ body{
   margin: 10px auto;
 }
 
-.seller__step1{
+.seller__step1,
+.seller__step3{
   display: flex;
-  justify-content: space-around;
-  min-height: 150px;
+  min-height: 120px;
 }
 
-.seller__step1 input[type="text"]{
+.seller__step2,
+.seller__step4{
+  min-height: 40px;
+}
+
+.seller input[type="text"]{
   display: block;
   padding: 5px;
   border-radius: 4px;
   border: 1px solid #999;
   height: 20px;
   font-size: 16px;
+  margin-bottom: 10px;
 }
 
 .seller__step1-to-send{
@@ -68,6 +74,35 @@ body{
   margin-left: 10px;
 }
 
+.seller__step3-to-send,
+.seller__step5-to-send,
+.seller__step5-input{
+  padding: 5px;
+  border-radius: 4px;
+  background: #CFCFCF;
+  max-height: 210px;
+  margin-left: 10px;
+}
+
+.seller__step3-to-send{
+  width: 814px;
+}
+
+.seller__step3-to-send textarea,
+.seller__step5-to-send textarea,
+.seller__step5-input textarea{
+  width: 99%;
+  min-height: 150px;
+  font-size: 16px;
+}
 
 
+.seller__step3-btn{
+  background-image: none;
+  background: #66CD00; 
+}
 
+.seller__step3-btn:hover{
+  background-image: none;
+  background: #458B00; 
+}

@@ -1,4 +1,8 @@
 function showPagePart(id){
+  var nodes = document.getElementsByClassName('container');
+  for(var i = 0; i < nodes.length; i++) {
+    nodes.item(i).style.display = "none";
+  }
   var el = document.getElementById(id);
   el.style.display = "block";
 }

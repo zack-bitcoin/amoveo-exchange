@@ -20,7 +20,7 @@
   // instructions + input
   var instructions = document.createElement("small");
   instructions.innerHTML = "Enter the amount of VEO you wish to sell";
-  var amt = input_text_maker(instructions.outerHTML, inputDiv);
+  var amt = input_text_maker(instructions, inputDiv);
 
   // right side and end of step 1 instructions
   var toSendDiv = document.createElement("div");
@@ -39,6 +39,7 @@
     variable_public_get(["pubkey"], function(pub) {
       toSendDiv.innerHTML = "Please deposit "+amountToSend+" VEO to "+pub;
       toSendDiv.innerHTML += "<br/><br/><small> <strong>Why?</strong> Deposit fee is currently 0.0007 VEO. trade fee is 0.05 VEO. If the bitcoin doesn't arrive withing the time limit, then the trade is refunded, you get 0.03 VEO of the fee back. </small>";
+      document.getElementById('veo-trade-amount').value = amountToSend;
     });
   })
 })();

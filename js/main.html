@@ -8,36 +8,33 @@
   </head>
   <body>
     <div id="translations"></div>
-    <div class="server" id="server"></div>
+    <div class="server" id="server">
+      <a href="instructions.html">How this tool works</a> | 
+    </div>
     <script type="text/javascript" src="server.js" ></script>
+
     <div id="header">
       <img src="logo.png" alt="Amoveo" height="150" />
       <h1>Amoveo Escrow Exchange Tool (BTC/VEO)</h1>
     </div>
 
-    <div id="buyer">
-      
+    <div id="seller" class="seller container">
+      <script type="text/javascript" src="step1.js" ></script>
+      <script type="text/javascript" src="step2.js" ></script>
+      <script type="text/javascript" src="step3.js" ></script>
+      <script type="text/javascript" src="step4.js" ></script>
+      <script type="text/javascript" src="step5.js" ></script>
     </div>
 
-    <div id="seller" class="seller">
-      <script type="text/javascript" src="step1.js" ></script>
+    <div id="buyer" class="container">
+      <script type="text/javascript" src="lookup_trade.js" ></script>
+      <script type="text/javascript" src="withdrawal.js" ></script>
     </div>
     
 
     
     <h3>lookup account</h3>
     <script type="text/javascript" src="lookup_account.js" ></script>
-    <h3>withdraw VEO</h3>
-    <script type="text/javascript" src="withdrawal.js" ></script>
-    <h3>make escrow</h3>
-    <script type="text/javascript" src="make_trade.js" ></script>
-
-  <p>warning. Only participate in a trade if there is enough time for your bitcoin tx to get 3 confirmations. We recommend at least 90 minutes = 5400 seconds.</p>
-
-    <h3>look up escrow</h3>
-    <script type="text/javascript" src="lookup_trade.js" ></script>
-
-    <a href="instructions.html">instructions</a>
     <script type="text/javascript" src="main.js" ></script>
   </body>
 </html>
