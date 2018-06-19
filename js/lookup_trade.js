@@ -1,7 +1,7 @@
 (function lookup_trade() {
     document.body.appendChild(document.createElement("br"));
     var div = document.createElement("div");
-    document.body.appendChild(div);
+    document.getElementById('buyer').appendChild(div);
     var button = document.createElement("input");
     button.type = "button";
     button.value = "lookup trade";

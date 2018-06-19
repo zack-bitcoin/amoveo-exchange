@@ -106,3 +106,20 @@ body{
   background-image: none;
   background: #458B00; 
 }
+
+.or{
+  text-align: center;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.or span{
+  background: #fff;
+  display: block;
+  width: 10%;
+  margin: -20px auto 0px auto;
+}
+
+#account{
+  text-align: center;
+}
